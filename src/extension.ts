@@ -26,6 +26,7 @@ class RSTPreviewer {
     
     public preview() {
         let doc = this.editor.document;
+        if (doc.languageId !== 'rst') return;
         let text = doc.getText();
         let cmd = "python preview.py";
         exec(cmd, function(error: Error, stdout: ArrayBuffer, stderr: ArrayBuffer) {
