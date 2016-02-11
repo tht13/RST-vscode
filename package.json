@@ -1,34 +1,50 @@
 {
-	"name": "rst-vscode",
-	"displayName": "RST-vscode",
-	"description": "RST extension for VSCode, including preview",
-	"version": "0.0.1",
-	"publisher": "tht13",
-	"engines": {
-		"vscode": "^0.10.8"
-	},
-	"categories": [
+    "name": "rst-vscode",
+    "displayName": "RST-vscode",
+    "description": "RST extension for VSCode, including preview",
+    "version": "0.0.1",
+    "publisher": "tht13",
+    "engines": {
+        "vscode": "^0.10.8"
+    },
+    "categories": [
         "Languages",
         "Snippets",
-		"Other"
-	],
-	"activationEvents": [
-		"onCommand:rst.preview"
-	],
-	"main": "./out/src/extension",
-	"contributes": {
-		"commands": [{
-			"command": "rst.preview",
-			"title": "Preview RST file"
-		}]
-	},
-	"scripts": {
-		"vscode:prepublish": "node ./node_modules/vscode/bin/compile",
-		"compile": "node ./node_modules/vscode/bin/compile -watch -p ./",
+        "Other"
+    ],
+    "activationEvents": [
+        "onCommand:rst.preview"
+    ],
+    "main": "./out/src/extension",
+    "contributes": {
+        "languages": [
+            {
+                "id": "rst",
+                "aliases": [
+                    "ReStructured Test",
+                    "RST"
+                ],
+                "extensions": [
+                    ".rst",
+                    ".rest",
+                    ".hrst"
+                ]
+            }
+        ],
+        "commands": [
+            {
+                "command": "rst.preview",
+                "title": "Preview RST file"
+            }
+        ]
+    },
+    "scripts": {
+        "vscode:prepublish": "node ./node_modules/vscode/bin/compile",
+        "compile": "node ./node_modules/vscode/bin/compile -watch -p ./",
         "postinstall": "node ./node_modules/vscode/bin/install"
-	},
-	"devDependencies": {
-		"typescript": "^1.7.5",
-		"vscode": "^0.11.0"
-	}
+    },
+    "devDependencies": {
+        "typescript": "^1.7.5",
+        "vscode": "^0.11.1"
+    }
 }
