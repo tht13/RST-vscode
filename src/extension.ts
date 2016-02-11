@@ -1,43 +1,124 @@
 'use strict';
-import { window, ExtensionContext, commands, TextEditor } from 'vscode';
-import { exec } from 'child_process';
+import { workspace, window, ExtensionContext, commands,
+TextEditor, TextDocumentContentProvider, EventEmitter,
+Event, Uri, TextDocumentChangeEvent, ViewColumn,
+TextEditorSelectionChangeEvent } from 'vscode';
+import { execSync } from 'child_process';
 //TODO: for dev only to see members of vscode, remove for memory optimisation
 import * as vscode from 'vscode';
+import * as fs from 'fs';
+import * as path from 'path';
 
 export function activate(context: ExtensionContext) {
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with  registerCommand
-	// The commandId parameter must match the command field in package.json
-	let disposable = commands.registerCommand('rst.preview', () => {
-		// The code you place here will be executed every time your command is executed
+    let previewUri = Uri.parse('rst-preview://authority/rst-preview');
 
-		// Display a message box to the user
-		window.showInformationMessage('Previewing!');
-        let previewer = new RSTPreviewer(window.activeTextEditor);
-        previewer.preview();
-	});
+    class TextDocumentContentProvider implements vscode.TextDocumentContentProvider {
+        private _onDidChange = new EventEmitter<Uri>();
+        private resultText = "";
 
-	context.subscriptions.push(disposable);
-}
+        public provideTextDocumentContent(uri: Uri): string {
+            return this.createRstSnippet();
+        }
 
-class RSTPreviewer {
-    constructor(private editor: TextEditor) {}
-    
-    public preview() {
-        let doc = this.editor.document;
-        if (doc.languageId !== 'rst') return;
-        let text = doc.getText();
-        let cmd = "python preview.py";
-        exec(cmd, function(error: Error, stdout: ArrayBuffer, stderr: ArrayBuffer) {
-            if (error.toString().length !== 0) {
-                console.warn(`[ERROR] Error message: ${error.toString()}`);
-                console.warn(`[ERROR] Error output: ${stderr.toString()}`);
+        get onDidChange(): Event<Uri> {
+            return this._onDidChange.event;
+        }
+
+        public update(uri: Uri) {
+            this._onDidChange.fire(uri);
+        }
+
+        private createRstSnippet() {
+            let editor = window.activeTextEditor;
+            if (!(editor.document.languageId === 'rst')) {
+                return this.errorSnippet("Active editor doesn't show a RST document - no properties to preview.")
             }
-        });
+            return this.extractSnippet();
+        }
+
+        private extractSnippet(): string {
+            return this.preview();
+        }
+
+        private errorSnippet(error: string): string {
+            return `
+                <body>
+                    ${error}
+                </body>`;
+        }
+
+        private snippet(properties): string {
+            return `<style>
+                    #el {
+                        ${properties}
+                    }
+                </style>
+                <body>
+                    <div>Preview of the rst properties</dev>
+                    <hr>
+                    <div id="el">Lorem ipsum dolor sit amet, mi et mauris nec ac luctus lorem, proin leo nulla integer metus vestibulum lobortis, eget</div>
+                </body>`;
+        }
+        public preview(): string {
+            let doc = window.activeTextEditor.document;
+            if (doc.languageId !== 'rst') return;
+            let filepath = doc.fileName
+            let cmd = "python " + path.join(__dirname, "..", "..", "src", "preview.py") + " " + filepath;
+            let previewer = this;
+            let stdout = execSync(cmd);
+            return stdout.toString();
+            previewer.resultText = stdout.toString();
+            workspace.openTextDocument(previewUri).then((doc: vscode.TextDocument) => {
+                let openDocs = window.visibleTextEditors;
+                for (let open of openDocs) {
+                    if (open.document.uri == previewUri) {
+                        open.edit((editor: vscode.TextEditorEdit) => {
+                            let start: vscode.Position = new vscode.Position(0, 0);
+                            let end: vscode.Position = new vscode.Position(
+                                open.document.lineAt(open.document.lineCount - 1).rangeIncludingLineBreak.end.character,
+                                open.document.lineCount - 1);
+                            editor.replace(new vscode.Range(start, end), stdout.toString());
+                        });
+                        break;
+                    }
+                }
+            }, (fail) => {
+                console.log(fail);
+            });
+        }
     }
+
+    let provider = new TextDocumentContentProvider();
+    let registration = workspace.registerTextDocumentContentProvider('rst-preview', provider);
+
+    workspace.onDidChangeTextDocument((e: TextDocumentChangeEvent) => {
+        if (e.document === window.activeTextEditor.document) {
+            provider.update(previewUri);
+        }
+    });
+
+    window.onDidChangeTextEditorSelection((e: TextEditorSelectionChangeEvent) => {
+        if (e.textEditor === window.activeTextEditor) {
+            provider.update(previewUri);
+        }
+    })
+
+    let disposable = commands.registerCommand('rst.preview', () => {
+        return commands.executeCommand('vscode.previewHtml', previewUri, ViewColumn.Two).then((success) => {
+        }, (reason) => {
+            window.showErrorMessage(reason);
+        });
+
+    });
+    context.subscriptions.push(disposable, registration);
 }
+
 
 // this method is called when your extension is deactivated
+class RSTPreviewer {
+    constructor(private editor: TextEditor) { }
+
+}
 export function deactivate() {
 }
