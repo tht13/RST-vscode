@@ -21,7 +21,7 @@
             {
                 "id": "rst",
                 "aliases": [
-                    "ReStructured Test",
+                    "ReStructured Text",
                     "RST"
                 ],
                 "extensions": [

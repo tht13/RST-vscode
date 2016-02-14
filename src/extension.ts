@@ -66,9 +66,9 @@ export function activate(context: ExtensionContext) {
             let filepath = doc.fileName
             let cmd = "python " + path.join(__dirname, "..", "..", "src", "preview.py") + " " + filepath;
             let previewer = this;
-            let stdout = execSync(cmd);
-            return stdout.toString();
-            previewer.resultText = stdout.toString();
+            let execSyncOut = execSync(cmd);
+            return execSyncOut.toString();
+            previewer.resultText = execSyncOut.toString();
             workspace.openTextDocument(previewUri).then((doc: vscode.TextDocument) => {
                 let openDocs = window.visibleTextEditors;
                 for (let open of openDocs) {
@@ -78,7 +78,7 @@ export function activate(context: ExtensionContext) {
                             let end: vscode.Position = new vscode.Position(
                                 open.document.lineAt(open.document.lineCount - 1).rangeIncludingLineBreak.end.character,
                                 open.document.lineCount - 1);
-                            editor.replace(new vscode.Range(start, end), stdout.toString());
+                            editor.replace(new vscode.Range(start, end), execSyncOut.toString());
                         });
                         break;
                     }
