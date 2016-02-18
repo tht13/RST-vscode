@@ -112,9 +112,5 @@ export function activate(context: ExtensionContext) {
 
 
 // this method is called when your extension is deactivated
-class RSTPreviewer {
-    constructor(private editor: TextEditor) { }
-
-}
 export function deactivate() {
 }
