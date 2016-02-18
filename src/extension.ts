@@ -34,11 +34,7 @@ export function activate(context: ExtensionContext) {
             if (!(editor.document.languageId === 'rst')) {
                 return this.errorSnippet("Active editor doesn't show a RST document - no properties to preview.")
             }
-            return this.extractSnippet();
-        }
-
-        private extractSnippet(): string {
-            return this.preview();
+            return this.preview(editor);
         }
 
         private errorSnippet(error: string): string {
