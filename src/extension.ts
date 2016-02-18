@@ -2,7 +2,8 @@
 import { workspace, window, ExtensionContext, commands,
 TextEditor, TextDocumentContentProvider, EventEmitter,
 Event, Uri, TextDocumentChangeEvent, ViewColumn,
-TextEditorSelectionChangeEvent } from 'vscode';
+TextEditorSelectionChangeEvent,
+TextDocument } from 'vscode';
 import { exec } from 'child_process';
 //TODO: for dev only to see members of vscode, remove for memory optimisation
 import * as vscode from 'vscode';
@@ -79,13 +80,13 @@ export function activate(context: ExtensionContext) {
             provider.update(previewUri);
         }
     });
-
-    window.onDidChangeTextEditorSelection((e: TextEditorSelectionChangeEvent) => {
-        if (e.textEditor === window.activeTextEditor) {
+    
+    workspace.onDidSaveTextDocument((e: TextDocument) => {
+        if (e === window.activeTextEditor.document) {
             provider.update(previewUri);
         }
-    })
-
+    });
+    
     let disposable = commands.registerCommand('rst.preview', () => {
         return commands.executeCommand('vscode.previewHtml', previewUri, ViewColumn.Two).then((success) => {
         }, (reason) => {
