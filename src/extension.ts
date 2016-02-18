@@ -5,8 +5,6 @@ Event, Uri, TextDocumentChangeEvent, ViewColumn,
 TextEditorSelectionChangeEvent,
 TextDocument } from 'vscode';
 import { exec } from 'child_process';
-//TODO: for dev only to see members of vscode, remove for memory optimisation
-import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as fileUrl from 'file-url';
@@ -15,7 +13,7 @@ export function activate(context: ExtensionContext) {
 
     let previewUri = Uri.parse('rst-preview://authority/rst-preview');
 
-    class TextDocumentContentProvider implements vscode.TextDocumentContentProvider {
+    class RstDocumentContentProvider implements TextDocumentContentProvider {
         private _onDidChange = new EventEmitter<Uri>();
         private resultText = "";
 
@@ -84,7 +82,7 @@ export function activate(context: ExtensionContext) {
         }
     }
 
-    let provider = new TextDocumentContentProvider();
+    let provider = new RstDocumentContentProvider();
     let registration = workspace.registerTextDocumentContentProvider('rst-preview', provider);
 
     workspace.onDidChangeTextDocument((e: TextDocumentChangeEvent) => {
