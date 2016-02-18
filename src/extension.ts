@@ -3,7 +3,7 @@ import { workspace, window, ExtensionContext, commands,
 TextEditor, TextDocumentContentProvider, EventEmitter,
 Event, Uri, TextDocumentChangeEvent, ViewColumn,
 TextEditorSelectionChangeEvent } from 'vscode';
-import { execSync } from 'child_process';
+import { exec } from 'child_process';
 //TODO: for dev only to see members of vscode, remove for memory optimisation
 import * as vscode from 'vscode';
 import * as fs from 'fs';
@@ -17,7 +17,7 @@ export function activate(context: ExtensionContext) {
         private _onDidChange = new EventEmitter<Uri>();
         private resultText = "";
 
-        public provideTextDocumentContent(uri: Uri): string {
+        public provideTextDocumentContent(uri: Uri): string | Thenable<string> {
             return this.createRstSnippet();
         }
 
@@ -29,7 +29,7 @@ export function activate(context: ExtensionContext) {
             this._onDidChange.fire(uri);
         }
 
-        private createRstSnippet() {
+        private createRstSnippet(): string | Thenable<string> {
             let editor = window.activeTextEditor;
             if (!(editor.document.languageId === 'rst')) {
                 return this.errorSnippet("Active editor doesn't show a RST document - no properties to preview.")
@@ -44,44 +44,30 @@ export function activate(context: ExtensionContext) {
                 </body>`;
         }
 
-        private snippet(properties): string {
-            return `<style>
-                    #el {
-                        ${properties}
-                    }
-                </style>
-                <body>
-                    <div>Preview of the rst properties</dev>
-                    <hr>
-                    <div id="el">Lorem ipsum dolor sit amet, mi et mauris nec ac luctus lorem, proin leo nulla integer metus vestibulum lobortis, eget</div>
-                </body>`;
-        }
-        public preview(): string {
-            let doc = window.activeTextEditor.document;
-            if (doc.languageId !== 'rst') return;
-            let filepath = doc.fileName
-            let cmd = "python " + path.join(__dirname, "..", "..", "src", "preview.py") + " " + filepath;
-            let previewer = this;
-            let execSyncOut = execSync(cmd);
-            return execSyncOut.toString();
-            previewer.resultText = execSyncOut.toString();
-            workspace.openTextDocument(previewUri).then((doc: vscode.TextDocument) => {
-                let openDocs = window.visibleTextEditors;
-                for (let open of openDocs) {
-                    if (open.document.uri == previewUri) {
-                        open.edit((editor: vscode.TextEditorEdit) => {
-                            let start: vscode.Position = new vscode.Position(0, 0);
-                            let end: vscode.Position = new vscode.Position(
-                                open.document.lineAt(open.document.lineCount - 1).rangeIncludingLineBreak.end.character,
-                                open.document.lineCount - 1);
-                            editor.replace(new vscode.Range(start, end), execSyncOut.toString());
-                        });
-                        break;
-                    }
+        public preview(editor: TextEditor): Thenable<string> {
+            let doc = editor.document;
+            let promise = new Promise<string>(
+                (resolve, reject) => {
+                    let filepath = doc.fileName
+                    let cmd = "python " + path.join(__dirname, "..", "..", "src", "preview.py") + " " + filepath;
+                    let previewer = this;
+                    exec(cmd, (error: Error, stdout: Buffer, stderr: Buffer) => {
+                        if (error) {
+                            let errorMessage = [
+                                error.name,
+                                error.message,
+                                error.stack,
+                                '',
+                                stderr.toString()
+                            ].join('\n');
+                            reject(errorMessage);
+                        } else {
+                            resolve(stdout.toString());
+                        }
+                    });
                 }
-            }, (fail) => {
-                console.log(fail);
-            });
+            );
+            return promise
         }
     }
 
