@@ -4,18 +4,29 @@
     "description": "RST extension for VSCode, including preview",
     "version": "0.0.1",
     "publisher": "tht13",
+    "author": "Thomas Haakon Townsend",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/tht13/RST-vscode"
+    },
+    "galleryBanner": {
+        "color": "",
+        "theme": "light"
+    },
+    "bugs": "https://github.com/tht13/RST-vscode/issues",
+    "homepage": "https://github.com/tht13/RST-vscode/blob/master/README.md",
+    "icon" : "",
+    "main": "./out/src/extension",
     "engines": {
         "vscode": "^0.10.8"
     },
     "categories": [
-        "Languages",
-        "Snippets",
         "Other"
     ],
     "activationEvents": [
         "onCommand:rst.preview"
     ],
-    "main": "./out/src/extension",
     "contributes": {
         "languages": [
             {
