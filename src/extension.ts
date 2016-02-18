@@ -9,6 +9,7 @@ import { exec } from 'child_process';
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
+import * as fileUrl from 'file-url';
 
 export function activate(context: ExtensionContext) {
 
@@ -63,7 +64,18 @@ export function activate(context: ExtensionContext) {
                             ].join('\n');
                             reject(errorMessage);
                         } else {
-                            resolve(stdout.toString());
+                            let result = stdout.toString();
+                            const css_style = '<link href="' + fileUrl(
+                                path.join(
+                                    __dirname,
+                                    "..",
+                                    "..",
+                                    "src",
+                                    "static",
+                                    "style.css"
+                                )
+                            ) + '" rel="stylesheet"/>';
+                            resolve(css_style + '\n' + result);
                         }
                     });
                 }
@@ -80,13 +92,13 @@ export function activate(context: ExtensionContext) {
             provider.update(previewUri);
         }
     });
-    
+
     workspace.onDidSaveTextDocument((e: TextDocument) => {
         if (e === window.activeTextEditor.document) {
             provider.update(previewUri);
         }
     });
-    
+
     let disposable = commands.registerCommand('rst.preview', () => {
         return commands.executeCommand('vscode.previewHtml', previewUri, ViewColumn.Two).then((success) => {
         }, (reason) => {
