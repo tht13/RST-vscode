@@ -1,7 +1,7 @@
 {
     "name": "rst-vscode",
-    "displayName": "RST-vscode",
-    "description": "RST extension for VSCode, including preview",
+    "displayName": "ReStructured Text Previewer",
+    "description": "An extension to preview RST files while typing them",
     "version": "0.0.1",
     "publisher": "tht13",
     "author": "Thomas Haakon Townsend",
@@ -11,12 +11,12 @@
         "url": "https://github.com/tht13/RST-vscode"
     },
     "galleryBanner": {
-        "color": "",
+        "color": "#78d6f0",
         "theme": "light"
     },
     "bugs": "https://github.com/tht13/RST-vscode/issues",
     "homepage": "https://github.com/tht13/RST-vscode/blob/master/README.md",
-    "icon" : "",
+    "icon" : "./images/icon.png",
     "main": "./out/src/extension",
     "engines": {
         "vscode": "^0.10.8"
