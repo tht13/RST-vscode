@@ -9,21 +9,17 @@
  *
  */
 
-@import url("basic.css");
-
 /* -- page layout ----------------------------------------------------------- */
 
-body {
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 150%;
-    background-color: #fff;
-    color: #000;
-    margin: 20px;
-    padding: 0;
+* {
+    font-size: initial;
+    background-color: #ddd;
+    color: #333;
 }
 
-div.document {
-    background-color: #fff;
+body {
+    margin: 20px;
+    padding: 0;
 }
 
 div.documentwrapper {

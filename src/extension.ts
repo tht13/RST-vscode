@@ -63,17 +63,35 @@ export function activate(context: ExtensionContext) {
                             reject(errorMessage);
                         } else {
                             let result = stdout.toString();
-                            const css_style = '<link href="' + fileUrl(
+                            const basic_style = '<link href="' + fileUrl(
                                 path.join(
                                     __dirname,
                                     "..",
                                     "..",
                                     "src",
                                     "static",
-                                    "style.css"
+                                    "basic.css"
                                 )
                             ) + '" rel="stylesheet"/>';
-                            resolve(css_style + '\n' + result);
+
+                            const default_style = '<link href="' + fileUrl(
+                                path.join(
+                                    __dirname,
+                                    "..",
+                                    "..",
+                                    "src",
+                                    "static",
+                                    "default.css"
+                                )
+                            ) + '" rel="stylesheet"/>';
+
+                            resolve(
+                                [
+                                    basic_style,
+                                    default_style,
+                                    result
+                                ].join('\n')
+                            );
                         }
                     });
                 }
