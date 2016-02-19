@@ -49,7 +49,7 @@ export function activate(context: ExtensionContext) {
             let promise = new Promise<string>(
                 (resolve, reject) => {
                     let filepath = doc.fileName
-                    let cmd = "python " + path.join(__dirname, "..", "..", "src", "preview.py") + " " + filepath;
+                    let cmd = "python3 " + path.join(__dirname, "..", "..", "src", "preview.py") + " " + filepath;
                     let previewer = this;
                     exec(cmd, (error: Error, stdout: Buffer, stderr: Buffer) => {
                         if (error) {
