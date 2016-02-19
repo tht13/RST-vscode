@@ -2,7 +2,7 @@ import sys
 from docutils import core
 filepath = sys.argv[1]
 
-page_string = open(filepath, 'r', encoding="utf-8-sig").read()
+page_string = open(filepath, 'r').read()
 
 overrides = {'input_encoding': 'unicode',
              'doctitle_xform': True,
