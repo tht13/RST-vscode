@@ -32,8 +32,8 @@
             {
                 "id": "rst",
                 "aliases": [
-                    "ReStructured Text",
-                    "RST"
+                    "RST",
+                    "ReStructured Text"
                 ],
                 "extensions": [
                     ".rst",
@@ -51,6 +51,13 @@
             {
                 "command": "rst.preview",
                 "title": "Preview RST file"
+            }
+        ],
+        "grammars": [
+            {
+                "language": "rst",
+                "path": "./syntaxes/restructuredtext.tmlanguage",
+                "scopeName": "text.restructuredtext"
             }
         ]
     },
