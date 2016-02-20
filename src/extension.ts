@@ -44,6 +44,20 @@ export function activate(context: ExtensionContext) {
                 </body>`;
         }
 
+        private createStylesheet(file: string) {
+            let href = fileUrl(
+                path.join(
+                    __dirname,
+                    "..",
+                    "..",
+                    "src",
+                    "static",
+                    file
+                )
+            )
+            return `<link href="${href}" rel="stylesheet" />`;
+        }
+
         public preview(editor: TextEditor): Thenable<string> {
             let doc = editor.document;
             let promise = new Promise<string>(
@@ -61,34 +75,11 @@ export function activate(context: ExtensionContext) {
                             ].join('\n');
                             reject(errorMessage);
                         } else {
-                            let result = stdout.toString();
-                            const basic_style = '<link href="' + fileUrl(
-                                path.join(
-                                    __dirname,
-                                    "..",
-                                    "..",
-                                    "src",
-                                    "static",
-                                    "basic.css"
-                                )
-                            ) + '" rel="stylesheet"/>';
-
-                            const default_style = '<link href="' + fileUrl(
-                                path.join(
-                                    __dirname,
-                                    "..",
-                                    "..",
-                                    "src",
-                                    "static",
-                                    "default.css"
-                                )
-                            ) + '" rel="stylesheet"/>';
-
                             resolve(
                                 [
-                                    basic_style,
-                                    default_style,
-                                    result
+                                    this.createStylesheet("basic.css"),
+                                    this.createStylesheet("default.css"),
+                                    stdout.toString()
                                 ].join('\n')
                             );
                         }
@@ -132,8 +123,8 @@ export function activate(context: ExtensionContext) {
 
     });
     context.subscriptions.push(previewToSide, registration);
-    
-    
+
+
     let preview = commands.registerCommand('rst.preview', () => {
         return commands.executeCommand('vscode.previewHtml', previewUri, window.activeTextEditor.viewColumn).then((success) => {
         }, (reason) => {
