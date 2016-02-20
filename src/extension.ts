@@ -7,7 +7,7 @@ TextDocument } from 'vscode';
 import { exec } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
-let fileUrl =  require('file-url');
+let fileUrl = require('file-url');
 
 export function activate(context: ExtensionContext) {
 
@@ -49,8 +49,7 @@ export function activate(context: ExtensionContext) {
             let promise = new Promise<string>(
                 (resolve, reject) => {
                     let filepath = doc.fileName
-                    let cmd = "python3 " + path.join(__dirname, "..", "..", "src", "preview.py") + " " + filepath;
-                    let previewer = this;
+                    let cmd = "python " + path.join(__dirname, "..", "..", "src", "preview.py") + " " + filepath;
                     exec(cmd, (error: Error, stdout: Buffer, stderr: Buffer) => {
                         if (error) {
                             let errorMessage = [
@@ -115,14 +114,34 @@ export function activate(context: ExtensionContext) {
         }
     });
 
-    let disposable = commands.registerCommand('rst.preview', () => {
-        return commands.executeCommand('vscode.previewHtml', previewUri, ViewColumn.Two).then((success) => {
+    let previewToSide = commands.registerCommand('rst.previewToSide', () => {
+        let displayColumn: ViewColumn;
+        switch (window.activeTextEditor.viewColumn) {
+            case ViewColumn.One:
+                displayColumn = ViewColumn.Two
+                break;
+            case ViewColumn.Two:
+            case ViewColumn.Three:
+                displayColumn = ViewColumn.Three
+                break;
+        }
+        return commands.executeCommand('vscode.previewHtml', previewUri, displayColumn).then((success) => {
         }, (reason) => {
             window.showErrorMessage(reason);
         });
 
     });
-    context.subscriptions.push(disposable, registration);
+    context.subscriptions.push(previewToSide, registration);
+    
+    
+    let preview = commands.registerCommand('rst.preview', () => {
+        return commands.executeCommand('vscode.previewHtml', previewUri, window.activeTextEditor.viewColumn).then((success) => {
+        }, (reason) => {
+            window.showErrorMessage(reason);
+        });
+
+    });
+    context.subscriptions.push(preview, registration);
 }
 
 

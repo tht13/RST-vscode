@@ -43,15 +43,28 @@
                 ]
             }
         ],
-        "keybindings": {
-            "command": "rst.preview",
-            "key": "ctrl+shift+r",
-            "when": "editorTextFocus"
-        },
-        "commands": [
+        "keybindings": [
             {
                 "command": "rst.preview",
-                "title": "Preview RST file"
+                "key": "ctrl+shift+r",
+                "when": "editorTextFocus"
+            },
+            {
+                "command": "rst.previewToSide",
+                "key": "ctrl+k r",
+                "when": "editorTextFocus"
+            }
+        ],
+        "commands": [
+            {
+                "command": "rst.previewToSide",
+                "title": "Open Preview to the Side",
+                "category": "ReStructured Text"
+            },
+            {
+                "command": "rst.preview",
+                "title": "Toggle Preview",
+                "category": "ReStructured Text"
             }
         ],
         "grammars": [
