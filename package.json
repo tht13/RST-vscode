@@ -16,12 +16,13 @@
     },
     "bugs": "https://github.com/tht13/RST-vscode/issues",
     "homepage": "https://github.com/tht13/RST-vscode/blob/master/README.md",
-    "icon" : "./images/icon.png",
+    "icon": "images/icon.png",
     "main": "./out/src/extension",
     "engines": {
         "vscode": "^0.10.8"
     },
     "categories": [
+        "Languages",
         "Other"
     ],
     "activationEvents": [
