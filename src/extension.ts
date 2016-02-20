@@ -44,6 +44,18 @@ export function activate(context: ExtensionContext) {
                 </body>`;
         }
 
+        private buildPage(document: string, headerArgs: string[]): string {
+            return `
+            <html lang="en">
+            <head>
+            ${headerArgs.join('\n')}
+            </head>
+            <body>
+            ${document}
+            </body>
+            </html>`;
+        }
+
         private createStylesheet(file: string) {
             let href = fileUrl(
                 path.join(
@@ -75,13 +87,11 @@ export function activate(context: ExtensionContext) {
                             ].join('\n');
                             reject(errorMessage);
                         } else {
-                            resolve(
-                                [
-                                    this.createStylesheet("basic.css"),
-                                    this.createStylesheet("default.css"),
-                                    stdout.toString()
-                                ].join('\n')
-                            );
+                            let headerArgs = [
+                                this.createStylesheet('basic.css'),
+                                this.createStylesheet('default.css')
+                            ];
+                            resolve(this.buildPage(stdout.toString(), headerArgs));
                         }
                     });
                 }
