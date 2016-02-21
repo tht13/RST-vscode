@@ -2,7 +2,7 @@
     "name": "rst-vscode",
     "displayName": "ReStructured Text Previewer",
     "description": "An extension to preview RST files while typing them",
-    "version": "1.0.1",
+    "version": "1.1.0",
     "publisher": "tht13",
     "author": "Thomas Haakon Townsend",
     "license": "MIT",
