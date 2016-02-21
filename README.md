@@ -1,9 +1,16 @@
 # ReStructured Text Previewer
 
-An extension to preview restructured text
+An extension to preview restructured text and provide syntax highlighting
 
-Activate with command "Preview RST file" or the keyboard shortcut ctrl+shift+r
+The extension can be activate in two ways
+
+* Toggle Preview - `ctrl+shift+r`
+* Open Preview to the Side - `ctrl+k r`
 
 ## Requirements
 
-Python 3
+Python 2 or 3
+
+### Known Issues
+
+* File encoding can cause the extension to fail on certain files
