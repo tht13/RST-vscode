@@ -1,17 +1,17 @@
-'use strict';
+"use strict";
 import { workspace, window, ExtensionContext, commands,
 TextEditor, TextDocumentContentProvider, EventEmitter,
 Event, Uri, TextDocumentChangeEvent, ViewColumn,
 TextEditorSelectionChangeEvent,
-TextDocument } from 'vscode';
-import { exec } from 'child_process';
-import * as fs from 'fs';
-import * as path from 'path';
-let fileUrl = require('file-url');
+TextDocument } from "vscode";
+import { exec } from "child_process";
+import * as fs from "fs";
+import * as path from "path";
+let fileUrl = require("file-url");
 
 export function activate(context: ExtensionContext) {
 
-    let previewUri = Uri.parse('rst-preview://authority/rst-preview');
+    let previewUri = Uri.parse("rst-preview://authority/rst-preview");
 
     class RstDocumentContentProvider implements TextDocumentContentProvider {
         private _onDidChange = new EventEmitter<Uri>();
@@ -31,8 +31,8 @@ export function activate(context: ExtensionContext) {
 
         private createRstSnippet(): string | Thenable<string> {
             let editor = window.activeTextEditor;
-            if (!(editor.document.languageId === 'rst')) {
-                return this.errorSnippet("Active editor doesn't show a RST document - no properties to preview.")
+            if (!(editor.document.languageId === "rst")) {
+                return this.errorSnippet("Active editor doesn't show a RST document - no properties to preview.");
             }
             return this.preview(editor);
         }
@@ -48,7 +48,7 @@ export function activate(context: ExtensionContext) {
             return `
             <html lang="en">
             <head>
-            ${headerArgs.join('\n')}
+            ${headerArgs.join("\n")}
             </head>
             <body>
             ${document}
@@ -66,7 +66,7 @@ export function activate(context: ExtensionContext) {
                     "static",
                     file
                 )
-            )
+            );
             return `<link href="${href}" rel="stylesheet" />`;
         }
 
@@ -80,7 +80,7 @@ export function activate(context: ExtensionContext) {
                             p2
                         )),
                         p3
-                    ].join('');
+                    ].join("");
                 }
             );
         }
@@ -89,7 +89,7 @@ export function activate(context: ExtensionContext) {
             let doc = editor.document;
             let promise = new Promise<string>(
                 (resolve, reject) => {
-                    let filepath = doc.fileName
+                    let filepath = doc.fileName;
                     let cmd = "python " + path.join(__dirname, "..", "..", "src", "preview.py") + " " + filepath;
                     exec(cmd, (error: Error, stdout: Buffer, stderr: Buffer) => {
                         if (error) {
@@ -97,27 +97,27 @@ export function activate(context: ExtensionContext) {
                                 error.name,
                                 error.message,
                                 error.stack,
-                                '',
+                                "",
                                 stderr.toString()
-                            ].join('\n');
+                            ].join("\n");
                             reject(errorMessage);
                         } else {
                             let result = this.fixLinks(stdout.toString(), editor.document.fileName);
                             let headerArgs = [
-                                this.createStylesheet('basic.css'),
-                                this.createStylesheet('default.css')
+                                this.createStylesheet("basic.css"),
+                                this.createStylesheet("default.css")
                             ];
                             resolve(this.buildPage(result, headerArgs));
                         }
                     });
                 }
             );
-            return promise
+            return promise;
         }
     }
 
     let provider = new RstDocumentContentProvider();
-    let registration = workspace.registerTextDocumentContentProvider('rst-preview', provider);
+    let registration = workspace.registerTextDocumentContentProvider("rst-preview", provider);
 
     workspace.onDidChangeTextDocument((e: TextDocumentChangeEvent) => {
         if (e.document === window.activeTextEditor.document) {
@@ -131,18 +131,18 @@ export function activate(context: ExtensionContext) {
         }
     });
 
-    let previewToSide = commands.registerCommand('rst.previewToSide', () => {
+    let previewToSide = commands.registerCommand("rst.previewToSide", () => {
         let displayColumn: ViewColumn;
         switch (window.activeTextEditor.viewColumn) {
             case ViewColumn.One:
-                displayColumn = ViewColumn.Two
+                displayColumn = ViewColumn.Two;
                 break;
             case ViewColumn.Two:
             case ViewColumn.Three:
-                displayColumn = ViewColumn.Three
+                displayColumn = ViewColumn.Three;
                 break;
         }
-        return commands.executeCommand('vscode.previewHtml', previewUri, displayColumn).then((success) => {
+        return commands.executeCommand("vscode.previewHtml", previewUri, displayColumn).then((success) => {
         }, (reason) => {
             window.showErrorMessage(reason);
         });
@@ -151,8 +151,8 @@ export function activate(context: ExtensionContext) {
     context.subscriptions.push(previewToSide, registration);
 
 
-    let preview = commands.registerCommand('rst.preview', () => {
-        return commands.executeCommand('vscode.previewHtml', previewUri, window.activeTextEditor.viewColumn).then((success) => {
+    let preview = commands.registerCommand("rst.preview", () => {
+        return commands.executeCommand("vscode.previewHtml", previewUri, window.activeTextEditor.viewColumn).then((success) => {
         }, (reason) => {
             window.showErrorMessage(reason);
         });
