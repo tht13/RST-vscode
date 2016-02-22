@@ -13,7 +13,7 @@ export function activate(context: ExtensionContext) {
 
     let previewUri: Uri;
 
-    let provider = new RstDocumentContentProvider();
+    let provider: RstDocumentContentProvider;
     let registration: Disposable;
 
     workspace.onDidChangeTextDocument((e: TextDocumentChangeEvent) => {
@@ -30,6 +30,7 @@ export function activate(context: ExtensionContext) {
 
     function sendHTMLCommand(displayColumn: ViewColumn): PromiseLike<void> {
         let previewTitle = `Preview: '${path.basename(window.activeTextEditor.document.fileName)}'`;
+        provider = new RstDocumentContentProvider();
         registration = workspace.registerTextDocumentContentProvider("rst-preview", provider);
         previewUri = Uri.parse(`rst-preview://preview/${previewTitle}`);
         return commands.executeCommand("vscode.previewHtml", previewUri, displayColumn).then((success) => {
