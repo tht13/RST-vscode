@@ -134,40 +134,38 @@ class RstDocumentContentProvider implements TextDocumentContentProvider {
 
     public preview(editor: TextEditor): Thenable<string> {
         let doc = editor.document;
-        return new Promise<string>(
-            (resolve, reject) => {
-                let cmd = [
-                    "python",
-                    path.join(
-                        __dirname,
-                        "..",
-                        "..",
-                        "src",
-                        "preview.py"
-                    ),
-                    doc.fileName
-                ].join(" ");
-                exec(cmd, (error: Error, stdout: Buffer, stderr: Buffer) => {
-                    if (error) {
-                        let errorMessage = [
-                            error.name,
-                            error.message,
-                            error.stack,
-                            "",
-                            stderr.toString()
-                        ].join("\n");
-                        console.error(errorMessage);
-                        reject(errorMessage);
-                    } else {
-                        let result = this.fixLinks(stdout.toString(), editor.document.fileName);
-                        let headerArgs = [
-                            this.createStylesheet("basic.css"),
-                            this.createStylesheet("default.css")
-                        ];
-                        resolve(this.buildPage(result, headerArgs));
-                    }
-                });
-            }
-        );
+        return new Promise<string>((resolve, reject) => {
+            let cmd = [
+                "python",
+                path.join(
+                    __dirname,
+                    "..",
+                    "..",
+                    "src",
+                    "preview.py"
+                ),
+                doc.fileName
+            ].join(" ");
+            exec(cmd, (error: Error, stdout: Buffer, stderr: Buffer) => {
+                if (error) {
+                    let errorMessage = [
+                        error.name,
+                        error.message,
+                        error.stack,
+                        "",
+                        stderr.toString()
+                    ].join("\n");
+                    console.error(errorMessage);
+                    reject(errorMessage);
+                } else {
+                    let result = this.fixLinks(stdout.toString(), editor.document.fileName);
+                    let headerArgs = [
+                        this.createStylesheet("basic.css"),
+                        this.createStylesheet("default.css")
+                    ];
+                    resolve(this.buildPage(result, headerArgs));
+                }
+            });
+        });
     }
 }
