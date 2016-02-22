@@ -79,7 +79,7 @@ class RstDocumentContentProvider implements TextDocumentContentProvider {
     private createRstSnippet(): string | Thenable<string> {
         let editor = window.activeTextEditor;
         if (!(editor.document.languageId === "rst")) {
-            return this.errorSnippet("Active editor doesn't show a RST document - no properties to preview.")
+            return this.errorSnippet("Active editor doesn't show a RST document - no properties to preview.");
         }
         return this.preview(editor);
     }
@@ -113,7 +113,7 @@ class RstDocumentContentProvider implements TextDocumentContentProvider {
                 "static",
                 file
             )
-        )
+        );
         return `<link href="${href}" rel="stylesheet" />`;
     }
 
@@ -134,10 +134,19 @@ class RstDocumentContentProvider implements TextDocumentContentProvider {
 
     public preview(editor: TextEditor): Thenable<string> {
         let doc = editor.document;
-        let promise = new Promise<string>(
+        return new Promise<string>(
             (resolve, reject) => {
-                let filepath = doc.fileName
-                let cmd = "python " + path.join(__dirname, "..", "..", "src", "preview.py") + " " + filepath;
+                let cmd = [
+                    "python",
+                    path.join(
+                        __dirname,
+                        "..",
+                        "..",
+                        "src",
+                        "preview.py"
+                    ),
+                    doc.fileName
+                ].join(" ");
                 exec(cmd, (error: Error, stdout: Buffer, stderr: Buffer) => {
                     if (error) {
                         let errorMessage = [
@@ -160,6 +169,5 @@ class RstDocumentContentProvider implements TextDocumentContentProvider {
                 });
             }
         );
-        return promise
     }
 }
