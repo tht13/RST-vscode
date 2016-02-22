@@ -29,11 +29,12 @@ export function activate(context: ExtensionContext) {
     });
 
     function sendHTMLCommand(displayColumn: ViewColumn): PromiseLike<void> {
-        let name = "Preview: " + path.basename(window.activeTextEditor.document.fileName, ".rst");
+        let previewTitle = `Preview: '${path.basename(window.activeTextEditor.document.fileName)}'`;
         registration = workspace.registerTextDocumentContentProvider("rst-preview", provider);
-        previewUri = Uri.parse("rst-preview://authority/rst-preview");
+        previewUri = Uri.parse(`rst-preview://preview/${previewTitle}`);
         return commands.executeCommand("vscode.previewHtml", previewUri, displayColumn).then((success) => {
         }, (reason) => {
+            console.warn(reason);
             window.showErrorMessage(reason);
         });
     }
