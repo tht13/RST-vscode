@@ -3,7 +3,7 @@ import { workspace, window, ExtensionContext, commands,
 TextEditor, TextDocumentContentProvider, EventEmitter,
 Event, Uri, TextDocumentChangeEvent, ViewColumn,
 TextEditorSelectionChangeEvent,
-TextDocument } from "vscode";
+TextDocument, Disposable } from "vscode";
 import { exec } from "child_process";
 import * as fs from "fs";
 import * as path from "path";
@@ -11,10 +11,10 @@ let fileUrl = require("file-url");
 
 export function activate(context: ExtensionContext) {
 
-    let previewUri = Uri.parse("rst-preview://authority/rst-preview");
+    let previewUri: Uri;
 
     let provider = new RstDocumentContentProvider();
-    let registration = workspace.registerTextDocumentContentProvider("rst-preview", provider);
+    let registration: Disposable;
 
     workspace.onDidChangeTextDocument((e: TextDocumentChangeEvent) => {
         if (e.document === window.activeTextEditor.document) {
@@ -28,6 +28,16 @@ export function activate(context: ExtensionContext) {
         }
     });
 
+    function sendHTMLCommand(displayColumn: ViewColumn): PromiseLike<void> {
+        let name = "Preview: " + path.basename(window.activeTextEditor.document.fileName, ".rst");
+        registration = workspace.registerTextDocumentContentProvider("rst-preview", provider);
+        previewUri = Uri.parse("rst-preview://authority/rst-preview");
+        return commands.executeCommand("vscode.previewHtml", previewUri, displayColumn).then((success) => {
+        }, (reason) => {
+            window.showErrorMessage(reason);
+        });
+    }
+
     let previewToSide = commands.registerCommand("rst.previewToSide", () => {
         let displayColumn: ViewColumn;
         switch (window.activeTextEditor.viewColumn) {
@@ -39,20 +49,13 @@ export function activate(context: ExtensionContext) {
                 displayColumn = ViewColumn.Three;
                 break;
         }
-        return commands.executeCommand("vscode.previewHtml", previewUri, displayColumn).then((success) => {
-        }, (reason) => {
-            window.showErrorMessage(reason);
-        });
-
+        return sendHTMLCommand(displayColumn);
     });
 
     let preview = commands.registerCommand("rst.preview", () => {
-        return commands.executeCommand("vscode.previewHtml", previewUri, window.activeTextEditor.viewColumn).then((success) => {
-        }, (reason) => {
-            window.showErrorMessage(reason);
-        });
-
+        return sendHTMLCommand(window.activeTextEditor.viewColumn);
     });
+
     context.subscriptions.push(previewToSide, preview, registration);
 }
 
