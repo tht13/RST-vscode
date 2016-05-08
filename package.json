@@ -6,6 +6,7 @@
     "publisher": "tht13",
     "author": "Thomas Haakon Townsend",
     "license": "MIT",
+    "readme": "README.md",
     "repository": {
         "type": "git",
         "url": "https://github.com/tht13/RST-vscode"
