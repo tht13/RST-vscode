@@ -1,174 +1,137 @@
 "use strict";
 import { workspace, window, ExtensionContext, commands,
-TextEditor, TextDocumentContentProvider, EventEmitter,
-Event, Uri, TextDocumentChangeEvent, ViewColumn,
-TextEditorSelectionChangeEvent,
+Uri, TextDocumentChangeEvent, ViewColumn,
 TextDocument, Disposable } from "vscode";
-import { exec } from "child_process";
-import * as fs from "fs";
 import * as path from "path";
-let fileUrl = require("file-url");
+import * as uuid from "node-uuid";
+import { RSTDocumentView } from "./document";
 
+let viewManager: ViewManager;
 export function activate(context: ExtensionContext) {
+    viewManager = new ViewManager();
 
-    let previewUri: Uri;
-
-    let provider: RstDocumentContentProvider;
-    let registration: Disposable;
-
-    workspace.onDidChangeTextDocument((e: TextDocumentChangeEvent) => {
-        if (e.document === window.activeTextEditor.document) {
-            provider.update(previewUri);
-        }
-    });
-
-    workspace.onDidSaveTextDocument((e: TextDocument) => {
-        if (e === window.activeTextEditor.document) {
-            provider.update(previewUri);
-        }
-    });
-
-    function sendHTMLCommand(displayColumn: ViewColumn): PromiseLike<void> {
-        let previewTitle = `Preview: '${path.basename(window.activeTextEditor.document.fileName)}'`;
-        provider = new RstDocumentContentProvider();
-        registration = workspace.registerTextDocumentContentProvider("rst-preview", provider);
-        previewUri = Uri.parse(`rst-preview://preview/${previewTitle}`);
-        return commands.executeCommand("vscode.previewHtml", previewUri, displayColumn).then((success) => {
-        }, (reason) => {
-            console.warn(reason);
-            window.showErrorMessage(reason);
-        });
-    }
-
-    let previewToSide = commands.registerCommand("rst.previewToSide", () => {
-        let displayColumn: ViewColumn;
-        switch (window.activeTextEditor.viewColumn) {
-            case ViewColumn.One:
-                displayColumn = ViewColumn.Two;
-                break;
-            case ViewColumn.Two:
-            case ViewColumn.Three:
-                displayColumn = ViewColumn.Three;
-                break;
-        }
-        return sendHTMLCommand(displayColumn);
-    });
-
-    let preview = commands.registerCommand("rst.preview", () => {
-        return sendHTMLCommand(window.activeTextEditor.viewColumn);
-    });
-
-    context.subscriptions.push(previewToSide, preview, registration);
+    context.subscriptions.push(
+        commands.registerCommand("rst.previewToSide", uri => viewManager.preview(uri, true)),
+        commands.registerCommand("rst.preview", () => viewManager.preview()),
+        commands.registerCommand("rst.source", () => viewManager.source())
+    );
 }
 
-// this method is called when your extension is deactivated
 export function deactivate() {
+    viewManager.dispose();
 }
 
-class RstDocumentContentProvider implements TextDocumentContentProvider {
-    private _onDidChange = new EventEmitter<Uri>();
-    private resultText = "";
+class ViewManager {
+    private idMap: IDMap = new IDMap();
+    private fileMap: Map<string, RSTDocumentView> = new Map<string, RSTDocumentView>();
 
-    public provideTextDocumentContent(uri: Uri): string | Thenable<string> {
-        return this.createRstSnippet();
-    }
-
-    get onDidChange(): Event<Uri> {
-        return this._onDidChange.event;
-    }
-
-    public update(uri: Uri) {
-        this._onDidChange.fire(uri);
-    }
-
-    private createRstSnippet(): string | Thenable<string> {
-        let editor = window.activeTextEditor;
-        if (!(editor.document.languageId === "rst")) {
-            return this.errorSnippet("Active editor doesn't show a RST document - no properties to preview.");
+    private sendRSTCommand(displayColumn: ViewColumn, doc: TextDocument, toggle: boolean = false) {
+        let id: string;
+        let rstDoc: RSTDocumentView;
+        if (!this.idMap.hasUri(doc.uri)) {
+            rstDoc = new RSTDocumentView(doc);
+            id = this.idMap.add(doc.uri, rstDoc.uri);
+            this.fileMap.set(id, rstDoc);
+        } else {
+            id = this.idMap.getByUri(doc.uri);
+            rstDoc = this.fileMap.get(id);
         }
-        return this.preview(editor);
+        rstDoc.execute(displayColumn);
     }
 
-    private errorSnippet(error: string): string {
-        return `
-                <body>
-                    ${error}
-                </body>`;
+    private getViewColumn(sideBySide: boolean): ViewColumn {
+        const active = window.activeTextEditor;
+        if (!active) {
+            return ViewColumn.One;
+        }
+
+        if (!sideBySide) {
+            return active.viewColumn;
+        }
+
+        switch (active.viewColumn) {
+            case ViewColumn.One:
+                return ViewColumn.Two;
+            case ViewColumn.Two:
+                return ViewColumn.Three;
+        }
+
+        return active.viewColumn;
     }
 
-    private buildPage(document: string, headerArgs: string[]): string {
-        return `
-            <html lang="en">
-            <head>
-            ${headerArgs.join("\n")}
-            </head>
-            <body>
-            ${document}
-            </body>
-            </html>`;
-    }
+    public source(mdUri?: Uri) {
+        if (!mdUri) {
+            return commands.executeCommand('workbench.action.navigateBack');
+        }
 
-    private createStylesheet(file: string) {
-        let href = fileUrl(
-            path.join(
-                __dirname,
-                "..",
-                "..",
-                "src",
-                "static",
-                file
-            )
-        );
-        return `<link href="${href}" rel="stylesheet" />`;
-    }
+        const docUri = Uri.parse(mdUri.query);
 
-    private fixLinks(document: string, documentPath: string): string {
-        return document.replace(
-            new RegExp("((?:src|href)=[\'\"])(.*?)([\'\"])", "gmi"), (subString: string, p1: string, p2: string, p3: string): string => [
-                p1,
-                fileUrl(path.join(
-                    path.dirname(documentPath),
-                    p2
-                )),
-                p3
-            ].join("")
-        );
-    }
+        for (let editor of window.visibleTextEditors) {
+            if (editor.document.uri.toString() === docUri.toString()) {
+                return window.showTextDocument(editor.document, editor.viewColumn);
+            }
+        }
 
-    public preview(editor: TextEditor): Thenable<string> {
-        let doc = editor.document;
-        return new Promise<string>((resolve, reject) => {
-            let cmd = [
-                "python",
-                path.join(
-                    __dirname,
-                    "..",
-                    "..",
-                    "src",
-                    "preview.py"
-                ),
-                doc.fileName
-            ].join(" ");
-            exec(cmd, (error: Error, stdout: Buffer, stderr: Buffer) => {
-                if (error) {
-                    let errorMessage = [
-                        error.name,
-                        error.message,
-                        error.stack,
-                        "",
-                        stderr.toString()
-                    ].join("\n");
-                    console.error(errorMessage);
-                    reject(errorMessage);
-                } else {
-                    let result = this.fixLinks(stdout.toString(), editor.document.fileName);
-                    let headerArgs = [
-                        this.createStylesheet("basic.css"),
-                        this.createStylesheet("default.css")
-                    ];
-                    resolve(this.buildPage(result, headerArgs));
-                }
-            });
+        return workspace.openTextDocument(docUri).then(doc => {
+            return window.showTextDocument(doc);
         });
+    }
+
+    public preview(uri?: Uri, sideBySide: boolean = false) {
+
+        let resource = uri;
+        if (!(resource instanceof Uri)) {
+            if (window.activeTextEditor) {
+                // we are relaxed and don't check for markdown files
+                resource = window.activeTextEditor.document.uri;
+            }
+        }
+
+        if (!(resource instanceof Uri)) {
+            if (!window.activeTextEditor) {
+                // this is most likely toggling the preview
+                return commands.executeCommand('rst.source');
+            }
+            // nothing found that could be shown or toggled
+            return;
+        }
+        // activeTextEditor does not exist when triggering on a rst preview
+        this.sendRSTCommand(this.getViewColumn(sideBySide),
+            window.activeTextEditor.document);
+    }
+
+    public dispose() {
+        let values = this.fileMap.values()
+        let value: IteratorResult<RSTDocumentView> = values.next();
+        while (!value.done) {
+            value.value.dispose();
+            value = values.next();
+        }
+    }
+}
+
+class IDMap {
+    private map: Map<[Uri, Uri], string> = new Map<[Uri, Uri], string>();
+
+    public getByUri(uri: Uri) {
+        let keys = this.map.keys()
+        let key: IteratorResult<[Uri, Uri]> = keys.next();
+        while (!key.done) {
+            if (key.value.indexOf(uri) > -1) {
+                return this.map.get(key.value);
+            }
+            key = keys.next();
+        }
+        return null;
+    }
+
+    public hasUri(uri: Uri) {
+        return this.getByUri(uri) !== null;
+    }
+
+    public add(uri1: Uri, uri2: Uri) {
+        let id = uuid.v4();
+        this.map.set([uri1, uri2], id);
+        return id;
     }
 }
