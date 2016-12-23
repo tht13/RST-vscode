@@ -20,7 +20,7 @@
   "icon": "media/icon.png",
   "main": "./out/src/extension",
   "engines": {
-    "vscode": "1.6.0"
+    "vscode": "^1.6.0"
   },
   "categories": [
     "Languages",
@@ -79,9 +79,9 @@
         }
       },
       {
-        "command": "html.source",
+        "command": "rst.source",
         "title": "Show Source",
-        "category": "HTML",
+        "category": "ReStructured Text",
         "icon": {
           "light": "./media/ViewSource.svg",
           "dark": "./media/ViewSource_inverse.svg"
