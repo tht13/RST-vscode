@@ -28,7 +28,8 @@
   ],
   "activationEvents": [
     "onCommand:rst.preview",
-    "onCommand:rst.previewToSide"
+    "onCommand:rst.previewToSide",
+    "onCommand:rst.source"
   ],
   "contributes": {
     "languages": [
@@ -49,26 +50,66 @@
       {
         "command": "rst.preview",
         "key": "ctrl+shift+r",
-        "when": "editorTextFocus"
+        "mac": "cmd+shift+r",
+        "when": "!terminalFocus"
       },
       {
         "command": "rst.previewToSide",
         "key": "ctrl+k r",
-        "when": "editorTextFocus"
+        "mac": "cmd+k r"
       }
     ],
     "commands": [
       {
         "command": "rst.preview",
-        "title": "Toggle Preview",
-        "category": "ReStructured Text"
+        "title": "Open Preview",
+        "category": "ReStructured Text",
+        "icon": {
+          "light": "./media/Preview.svg",
+          "dark": "./media/Preview_inverse.svg"
+        }
       },
       {
         "command": "rst.previewToSide",
         "title": "Open Preview to the Side",
-        "category": "ReStructured Text"
+        "category": "ReStructured Text",
+        "icon": {
+          "light": "./media/PreviewOnRightPane_16x.svg",
+          "dark": "./media/PreviewOnRightPane_16x_dark.svg"
+        }
+      },
+      {
+        "command": "html.source",
+        "title": "Show Source",
+        "category": "HTML",
+        "icon": {
+          "light": "./media/ViewSource.svg",
+          "dark": "./media/ViewSource_inverse.svg"
+        }
       }
     ],
+    "menus": {
+      "editor/title": [
+        {
+          "when": "editorLangId == rst",
+          "command": "rst.preview",
+          "alt": "rst.previewToSide",
+          "group": "navigation"
+        },
+        {
+          "when": "resourceScheme == rst",
+          "command": "rst.source",
+          "group": "navigation"
+        }
+      ],
+      "explorer/context": [
+        {
+          "when": "editorLangId == rst",
+          "command": "rst.preview",
+          "group": "navigation"
+        }
+      ]
+    },
     "grammars": [
       {
         "language": "rst",
