@@ -128,12 +128,14 @@
     "postversion": "git push --follow-tags"
   },
   "dependencies": {
-    "file-url": "2.0.0"
+    "file-url": "2.0.0",
+    "node-uuid": "^1.4.7"
   },
   "devDependencies": {
     "@studio/changes": "^1.0.5",
     "@types/file-url": "^1.0.28",
     "@types/node": "^6.0.52",
+    "@types/node-uuid": "0.0.28",
     "typescript": "2.1.4",
     "vscode": "1.0.3"
   }
