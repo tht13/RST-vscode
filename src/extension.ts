@@ -124,16 +124,14 @@ class RstDocumentContentProvider implements TextDocumentContentProvider {
 
     private fixLinks(document: string, documentPath: string): string {
         return document.replace(
-            new RegExp("((?:src|href)=[\'\"])(.*?)([\'\"])", "gmi"), (subString: string, p1: string, p2: string, p3: string): string => {
-                return [
-                    p1,
-                    fileUrl(path.join(
-                        path.dirname(documentPath),
-                        p2
-                    )),
-                    p3
-                ].join("");
-            }
+            new RegExp("((?:src|href)=[\'\"])(.*?)([\'\"])", "gmi"), (subString: string, p1: string, p2: string, p3: string): string => [
+                p1,
+                fileUrl(path.join(
+                    path.dirname(documentPath),
+                    p2
+                )),
+                p3
+            ].join("")
         );
     }
 
