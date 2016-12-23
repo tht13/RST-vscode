@@ -1,5 +1,18 @@
 # Changes
 
+## 2.0.0
+
+- Update code to match markdown extension (Thomas Townsend)
+- Fix command registration (Thomas Townsend)
+- Move preview.py into python folder (Thomas Townsend)
+- Ship with docutils (Thomas Townsend)
+- Ignore compiled python files (Thomas Townsend)
+- install node-uuid (Thomas Townsend)
+- Move css up a dir-level (Thomas Townsend)
+- Update package.json commands (Thomas Townsend)
+- Add preview icons (Thomas Townsend)
+- Rename images folder to media (Thomas Townsend)
+
 ## 1.3.1
 
 - Remove typings (Thomas Townsend)
