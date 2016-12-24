@@ -94,7 +94,7 @@ export class RSTDocumentView {
   }
 }
 
-class RSTDocumentContentProvider implements TextDocumentContentProvider {
+export class RSTDocumentContentProvider implements TextDocumentContentProvider {
   private _onDidChange = new EventEmitter<Uri>();
   private doc: TextDocument;
 
@@ -129,15 +129,7 @@ class RSTDocumentContentProvider implements TextDocumentContentProvider {
   }
 
   private buildPage(document: string, headerArgs: string[]): string {
-    return `
-            <html lang="en">
-            <head>
-            ${headerArgs.join("\n")}
-            </head>
-            <body>
-            ${document}
-            </body>
-            </html>`;
+    return `<html lang="en">\n<head>\n${headerArgs.join("\n")}\n</head>\n<body>\n${document}\n</body>\n</html>`;
   }
 
   private createStylesheet(file: string) {

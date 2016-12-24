@@ -21,7 +21,7 @@ export function deactivate() {
     viewManager.dispose();
 }
 
-class ViewManager {
+export class ViewManager {
     private idMap: IDMap = new IDMap();
     private fileMap: Map<string, RSTDocumentView> = new Map<string, RSTDocumentView>();
 
