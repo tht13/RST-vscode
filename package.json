@@ -125,7 +125,9 @@
     "postinstall": "node ./node_modules/vscode/bin/install",
     "preversion": "npm run build",
     "version": "changes",
-    "postversion": "git push --follow-tags"
+    "postversion": "git push --follow-tags",
+    "pretest": "npm run build",
+    "test": "node ./node_modules/vscode/bin/test"
   },
   "dependencies": {
     "file-url": "2.0.0",
@@ -134,8 +136,10 @@
   "devDependencies": {
     "@studio/changes": "^1.0.5",
     "@types/file-url": "^1.0.28",
+    "@types/mocha": "^2.2.34",
     "@types/node": "^6.0.52",
     "@types/node-uuid": "0.0.28",
+    "mocha": "^3.2.0",
     "typescript": "2.1.4",
     "vscode": "1.0.3"
   }
