@@ -1,5 +1,14 @@
 # Changes
 
+## 2.1.0
+
+- Fix expected test result (Thomas Townsend)
+- Add testing to version incrementation pipeline (Thomas Townsend)
+- Add tests (Thomas Townsend)
+- Update code for testing (Thomas Townsend)
+- Update samples (Thomas Townsend)
+- Prep for tests (Thomas Townsend)
+
 ## 2.0.0
 
 - Update code to match markdown extension (Thomas Townsend)
