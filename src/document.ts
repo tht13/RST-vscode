@@ -116,23 +116,20 @@ export class RSTDocumentContentProvider implements TextDocumentContentProvider {
 
   private createRSTSnippet(): string | Promise<string> {
     if (this.doc.languageId !== "rst") {
-      return this.errorSnippet("Active editor doesn't show a RST document - no properties to preview.");
+      return RSTDocumentContentProvider.errorSnippet("Active editor doesn't show a RST document - no properties to preview.");
     }
     return this.preview();
   }
 
-  private errorSnippet(error: string): string {
-    return `
-                <body>
-                    ${error}
-                </body>`;
+  private static errorSnippet(error: string): string {
+    return `<body>${error}</body>`;
   }
 
-  private buildPage(document: string, headerArgs: string[]): string {
+  private static buildPage(document: string, headerArgs: string[]): string {
     return `<html lang="en">\n<head>\n${headerArgs.join("\n")}\n</head>\n<body>\n${document}\n</body>\n</html>`;
   }
 
-  private createStylesheet(file: string) {
+  private static createStylesheet(file: string) {
     let href = fileUrl(
       path.join(
         __dirname,
@@ -145,7 +142,7 @@ export class RSTDocumentContentProvider implements TextDocumentContentProvider {
     return `<link href="${href}" rel="stylesheet" />`;
   }
 
-  private fixLinks(document: string, documentPath: string): string {
+  private static fixLinks(document: string, documentPath: string): string {
     return document.replace(
       new RegExp("((?:src|href)=[\'\"])((?!http|\\/).*?)([\'\"])", "gmi"),
       (subString: string, p1: string, p2: string, p3: string): string => {
@@ -161,7 +158,7 @@ export class RSTDocumentContentProvider implements TextDocumentContentProvider {
     );
   }
 
-  public preview(): Promise<string> {
+  public static compile(fileName: string): Promise<string> {
     return new Promise<string>((resolve, reject) => {
       let cmd = [
         "python",
@@ -173,7 +170,7 @@ export class RSTDocumentContentProvider implements TextDocumentContentProvider {
           "python",
           "preview.py"
         ),
-        this.doc.fileName
+        fileName
       ].join(" ");
       exec(cmd, (error: Error, stdout: Buffer, stderr: Buffer) => {
         if (error) {
@@ -187,14 +184,19 @@ export class RSTDocumentContentProvider implements TextDocumentContentProvider {
           console.error(errorMessage);
           reject(errorMessage);
         } else {
-          let result = this.fixLinks(stdout.toString(), this.doc.fileName);
-          let headerArgs = [
-            this.createStylesheet("basic.css"),
-            this.createStylesheet("default.css")
-          ];
-          resolve(this.buildPage(result, headerArgs));
+          resolve(stdout.toString());
         }
       });
     });
+  }
+
+  public async preview(): Promise<string> {
+    const html = await RSTDocumentContentProvider.compile(this.doc.fileName);
+    let result = RSTDocumentContentProvider.fixLinks(html, this.doc.fileName);
+    let headerArgs = [
+      RSTDocumentContentProvider.createStylesheet("basic.css"),
+      RSTDocumentContentProvider.createStylesheet("default.css")
+    ];
+    return RSTDocumentContentProvider.buildPage(result, headerArgs);
   }
 }
