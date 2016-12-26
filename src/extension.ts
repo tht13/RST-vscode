@@ -101,11 +101,8 @@ export class ViewManager {
     }
 
     public dispose() {
-        let values = this.fileMap.values()
-        let value: IteratorResult<RSTDocumentView> = values.next();
-        while (!value.done) {
-            value.value.dispose();
-            value = values.next();
+        for (let doc of this.fileMap.values()) {
+            doc.dispose();
         }
     }
 }
@@ -114,13 +111,10 @@ class IDMap {
     private map: Map<[Uri, Uri], string> = new Map<[Uri, Uri], string>();
 
     public getByUri(uri: Uri) {
-        let keys = this.map.keys()
-        let key: IteratorResult<[Uri, Uri]> = keys.next();
-        while (!key.done) {
-            if (key.value.indexOf(uri) > -1) {
-                return this.map.get(key.value);
+        for (let key of this.map.keys()) {
+            if (key.indexOf(uri) > -1) {
+                return this.map.get(key);
             }
-            key = keys.next();
         }
         return null;
     }

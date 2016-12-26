@@ -43,14 +43,13 @@ export class RSTDocumentView {
       if (this.isRSTFile(event.document)) {
         const uri = this.getRSTUri(event.document.uri);
         this.provider.update(uri);
-
       }
     });
 
     workspace.onDidChangeConfiguration(() => {
       workspace.textDocuments.forEach(document => {
         if (document.uri.scheme === 'rst') {
-          // update all generated md documents
+          // update all generated rst documents
           this.provider.update(document.uri);
         }
       });
@@ -66,8 +65,8 @@ export class RSTDocumentView {
   }
 
   private get visible(): boolean {
-    for (let i in window.visibleTextEditors) {
-      if (window.visibleTextEditors[i].document.uri === this.previewUri) {
+    for (let editor of window.visibleTextEditors) {
+      if (editor.document.uri === this.previewUri) {
         return true;
       }
     }
@@ -83,8 +82,8 @@ export class RSTDocumentView {
   }
 
   public dispose() {
-    for (let i in this.registrations) {
-      this.registrations[i].dispose();
+    for (let reg of this.registrations) {
+      reg.dispose();
     }
   }
 
