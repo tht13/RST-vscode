@@ -40,15 +40,25 @@ suite("Extension Tests", () => {
     });
 
     // Defines a Mocha unit test
-    test("Example 1 to HTML", done => {
+    test("Example 1 full preview", done => {
         openFile(path.join(samplePath, "example1.rst")).then(editor => {
             const provider = new RSTDocumentContentProvider(editor.document);
             provider.preview().then(val => {
-                fs.readFile(path.join(samplePath, "example1.html"), "utf8", (err, expected) => {
+                fs.readFile(path.join(samplePath, "example1Full.html"), "utf8", (err, expected) => {
                     assert.equal(val, expected, "Generated HTML does not match expected");
                     done();
                 });
             })
         });
+    });
+
+    // Defines a Mocha unit test
+    test("Example 1 to HTML", done => {
+        RSTDocumentContentProvider.compile(path.join(samplePath, "example1.rst")).then(val => {
+            fs.readFile(path.join(samplePath, "example1.html"), "utf8", (err, expected) => {
+                assert.equal(val, expected, "Generated HTML does not match expected");
+                done();
+            });
+        })
     });
 });
