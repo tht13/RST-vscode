@@ -4,4 +4,5 @@ node_modules
 .vscode/symbols.json
 npm-debug.log
 *.pyc
+__pycache__
 .vscode-test
