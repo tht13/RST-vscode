@@ -23,7 +23,7 @@
     "vscode": "^1.6.0"
   },
   "categories": [
-    "Languages",
+    "Programming Languages",
     "Other"
   ],
   "activationEvents": [
@@ -131,16 +131,16 @@
   },
   "dependencies": {
     "file-url": "2.0.0",
-    "node-uuid": "^1.4.7"
+    "node-uuid": "1.4.8"
   },
   "devDependencies": {
     "@studio/changes": "^1.0.5",
-    "@types/file-url": "^1.0.28",
-    "@types/mocha": "^2.2.34",
-    "@types/node": "^6.0.52",
+    "@types/file-url": "2.0.0",
+    "@types/mocha": "5.2.5",
+    "@types/node": "10.10.1",
     "@types/node-uuid": "0.0.28",
-    "mocha": "^3.2.0",
-    "typescript": "2.1.4",
-    "vscode": "1.0.3"
+    "mocha": "5.2.0",
+    "typescript": "3.0.3",
+    "vscode": "1.1.21"
   }
 }

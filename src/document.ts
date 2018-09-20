@@ -1,7 +1,15 @@
 import {
-  workspace, window, commands, TextDocumentContentProvider,
-  Event, Uri, TextDocumentChangeEvent, ViewColumn, EventEmitter,
-  TextDocument, Disposable
+  workspace,
+  window,
+  commands,
+  TextDocumentContentProvider,
+  Event,
+  Uri,
+  TextDocumentChangeEvent,
+  ViewColumn,
+  EventEmitter,
+  TextDocument,
+  Disposable
 } from "vscode";
 import * as path from "path";
 import fileUrl = require("file-url");
@@ -16,7 +24,9 @@ export class RSTDocumentView {
   constructor(document: TextDocument) {
     this.doc = document;
     this.provider = new RSTDocumentContentProvider(this.doc);
-    this.registrations.push(workspace.registerTextDocumentContentProvider("rst", this.provider));
+    this.registrations.push(
+      workspace.registerTextDocumentContentProvider("rst", this.provider)
+    );
     this.previewUri = this.getRSTUri(document.uri);
     this.registerEvents();
   }
@@ -25,43 +35,47 @@ export class RSTDocumentView {
     return this.previewUri;
   }
 
-
-
-  private getRSTUri(uri: Uri) {
-    return uri.with({ scheme: 'rst', path: uri.path + '.rendered', query: uri.toString() });
+  private getRSTUri(uri: Uri): Uri {
+    return uri.with({
+      scheme: "rst",
+      path: uri.path + ".rendered",
+      query: uri.toString()
+    });
   }
 
-  private registerEvents() {
+  private registerEvents(): void {
     workspace.onDidSaveTextDocument(document => {
       if (this.isRSTFile(document)) {
-        const uri = this.getRSTUri(document.uri);
+        const uri: Uri = this.getRSTUri(document.uri);
         this.provider.update(uri);
       }
     });
 
     workspace.onDidChangeTextDocument(event => {
       if (this.isRSTFile(event.document)) {
-        const uri = this.getRSTUri(event.document.uri);
+        const uri: Uri = this.getRSTUri(event.document.uri);
         this.provider.update(uri);
       }
     });
 
     workspace.onDidChangeConfiguration(() => {
       workspace.textDocuments.forEach(document => {
-        if (document.uri.scheme === 'rst') {
+        if (document.uri.scheme === "rst") {
           // update all generated rst documents
           this.provider.update(document.uri);
         }
       });
     });
-    this.registrations.push(workspace.onDidChangeTextDocument((e: TextDocumentChangeEvent) => {
-      if (!this.visible) {
-        return;
-      }
-      if (e.document === this.doc) {
-        this.provider.update(this.previewUri);
-      }
-    }));
+    this.registrations.push(
+      workspace.onDidChangeTextDocument((e: TextDocumentChangeEvent) => {
+        if (!this.visible) {
+          return;
+        }
+        if (e.document === this.doc) {
+          this.provider.update(this.previewUri);
+        }
+      })
+    );
   }
 
   private get visible(): boolean {
@@ -73,23 +87,29 @@ export class RSTDocumentView {
     return false;
   }
 
-  public execute(column: ViewColumn) {
-    commands.executeCommand("vscode.previewHtml", this.previewUri, column, `Preview '${path.basename(this.uri.fsPath)}'`).then((success) => {
-    }, (reason) => {
+  public async execute(column: ViewColumn): Promise<void> {
+    try {
+      await commands.executeCommand(
+        "vscode.previewHtml",
+        this.previewUri,
+        column,
+        `Preview '${path.basename(this.uri.fsPath)}'`
+      );
+      return;
+    } catch (reason) {
       console.warn(reason);
       window.showErrorMessage(reason);
-    });
+    }
   }
 
-  public dispose() {
+  public dispose(): void {
     for (let reg of this.registrations) {
       reg.dispose();
     }
   }
 
-  private isRSTFile(document: TextDocument) {
-    return document.languageId === 'rst'
-      && document.uri.scheme !== 'rst'; // prevent processing of own documents
+  private isRSTFile(document: TextDocument): boolean {
+    return document.languageId === "rst" && document.uri.scheme !== "rst"; // prevent processing of own documents
   }
 }
 
@@ -109,13 +129,15 @@ export class RSTDocumentContentProvider implements TextDocumentContentProvider {
     return this._onDidChange.event;
   }
 
-  public update(uri: Uri) {
+  public update(uri: Uri): void {
     this._onDidChange.fire(uri);
   }
 
   private createRSTSnippet(): string | Promise<string> {
     if (this.doc.languageId !== "rst") {
-      return RSTDocumentContentProvider.errorSnippet("Active editor doesn't show a RST document - no properties to preview.");
+      return RSTDocumentContentProvider.errorSnippet(
+        "Active editor doesn't show a RST document - no properties to preview."
+      );
     }
     return this.preview();
   }
@@ -125,32 +147,25 @@ export class RSTDocumentContentProvider implements TextDocumentContentProvider {
   }
 
   private static buildPage(document: string, headerArgs: string[]): string {
-    return `<html lang="en">\n<head>\n${headerArgs.join("\n")}\n</head>\n<body>\n${document}\n</body>\n</html>`;
+    return `<html lang="en">\n<head>\n${headerArgs.join(
+      "\n"
+    )}\n</head>\n<body>\n${document}\n</body>\n</html>`;
   }
 
-  private static createStylesheet(file: string) {
-    let href = fileUrl(
-      path.join(
-        __dirname,
-        "..",
-        "..",
-        "static",
-        file
-      )
+  private static createStylesheet(file: string): string {
+    let href: string = fileUrl(
+      path.join(__dirname, "..", "..", "static", file)
     );
     return `<link href="${href}" rel="stylesheet" />`;
   }
 
   private static fixLinks(document: string, documentPath: string): string {
     return document.replace(
-      new RegExp("((?:src|href)=[\'\"])((?!http|\\/).*?)([\'\"])", "gmi"),
+      new RegExp("((?:src|href)=['\"])((?!http|\\/).*?)(['\"])", "gmi"),
       (subString: string, p1: string, p2: string, p3: string): string => {
         return [
           p1,
-          fileUrl(path.join(
-            path.dirname(documentPath),
-            p2
-          )),
+          fileUrl(path.join(path.dirname(documentPath), p2)),
           p3
         ].join("");
       }
@@ -159,21 +174,14 @@ export class RSTDocumentContentProvider implements TextDocumentContentProvider {
 
   public static compile(fileName: string): Promise<string> {
     return new Promise<string>((resolve, reject) => {
-      let cmd = [
+      let cmd: string = [
         "python",
-        path.join(
-          __dirname,
-          "..",
-          "..",
-          "src",
-          "python",
-          "preview.py"
-        ),
+        path.join(__dirname, "..", "..", "src", "python", "preview.py"),
         fileName
       ].join(" ");
-      exec(cmd, (error: Error, stdout: Buffer, stderr: Buffer) => {
+      exec(cmd, (error: Error, stdout: string, stderr: string) => {
         if (error) {
-          let errorMessage = [
+          let errorMessage: string = [
             error.name,
             error.message,
             error.stack,
@@ -190,9 +198,9 @@ export class RSTDocumentContentProvider implements TextDocumentContentProvider {
   }
 
   public async preview(): Promise<string> {
-    const html = await RSTDocumentContentProvider.compile(this.doc.fileName);
-    let result = RSTDocumentContentProvider.fixLinks(html, this.doc.fileName);
-    let headerArgs = [
+    const html: string = await RSTDocumentContentProvider.compile(this.doc.fileName);
+    let result: string = RSTDocumentContentProvider.fixLinks(html, this.doc.fileName);
+    let headerArgs: string[] = [
       RSTDocumentContentProvider.createStylesheet("basic.css"),
       RSTDocumentContentProvider.createStylesheet("default.css")
     ];
