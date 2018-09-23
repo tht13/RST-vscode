@@ -13,6 +13,7 @@ import { Logger } from '../logger';
 import { ContentSecurityPolicyArbiter, HTMLPreviewSecurityLevel } from '../security';
 import { HTMLPreviewConfigurationManager, HTMLPreviewConfiguration } from './previewConfig';
 import * as cheerio from "cheerio";
+import { RSTEngine } from '../rstEngine';
 
 /**
  * Strings used inside the html preview.
@@ -43,12 +44,12 @@ export class HTMLContentProvider {
 
 	private readonly TAG_RegEx = /^\s*?\<(p|h[1-6]|img|code|div|blockquote|li)((\s+.*?)(class="(.*?)")(.*?\>)|\>|\>|\/\>|\s+.*?\>)/;
 
-	public provideTextDocumentContent(
+	public async provideTextDocumentContent(
 		htmlDocument: vscode.TextDocument,
 		previewConfigurations: HTMLPreviewConfigurationManager,
 		initialLine: number | undefined = undefined,
 		state?: any
-	): string {
+	): Promise<string> {
 		const sourceUri = htmlDocument.uri;
 		const config = previewConfigurations.loadAndCacheConfiguration(sourceUri);
 		const initialData = {
@@ -66,8 +67,8 @@ export class HTMLContentProvider {
 		// Content Security Policy
 		const nonce = new Date().getTime() + '' + new Date().getMilliseconds();
 		const csp = this.getCspForResource(sourceUri, nonce);
-
-        const parsedDoc = htmlDocument.getText().split("\n").map((l,i) => 
+		const renderedDoc = await RSTEngine.preview(htmlDocument);
+        const parsedDoc = renderedDoc.split("\n").map((l,i) => 
 			l.replace(this.TAG_RegEx, (
 				match: string, p1: string, p2: string, p3: string, 
 				p4: string, p5: string, p6: string, offset: number) => 

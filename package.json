@@ -20,7 +20,7 @@
   "icon": "media/icon.png",
   "main": "./out/src/extension",
   "engines": {
-    "vscode": "^1.6.0"
+    "vscode": "^1.26.0"
   },
   "categories": [
     "Programming Languages",
@@ -119,28 +119,34 @@
     ]
   },
   "scripts": {
-    "build": "tsc -p ./",
-    "vscode:prepublish": "npm run build",
-    "watch": "tsc -watch -p ./",
+    "vscode:prepublish": "npm run compile",
+    "compile": "npm run build-ext && npm run build-preview",
+    "build-ext": "npx tsc -p ./tsconfig.json",
+    "build-preview": "./node_modules/.bin/webpack-cli",
+    "watch": "npx tsc -watch -p ./tsconfig.json",
     "postinstall": "node ./node_modules/vscode/bin/install",
-    "preversion": "npm test",
-    "version": "changes",
-    "postversion": "git push --follow-tags",
-    "pretest": "npm run build",
-    "test": "node ./node_modules/vscode/bin/test"
+    "test": "npm run compile && node ./node_modules/vscode/bin/test",
+    "preversion": "npm run compile",
+    "version": "./node_modules/.bin/changes",
+    "postversion": "git push --follow-tags"
   },
   "dependencies": {
-    "file-url": "2.0.0",
-    "node-uuid": "1.4.8"
+    "cheerio": "1.0.0-rc.2",
+    "lodash.throttle": "4.1.1",
+    "vscode-nls": "3.2.4"
   },
   "devDependencies": {
-    "@studio/changes": "^1.0.5",
-    "@types/file-url": "2.0.0",
-    "@types/mocha": "5.2.5",
-    "@types/node": "10.10.1",
-    "@types/node-uuid": "0.0.28",
-    "mocha": "5.2.0",
+    "@studio/changes": "1.7.0",
+    "@types/cheerio": "0.22.9",
+    "@types/lodash.throttle": "4.1.4",
+    "@types/mocha": "2.2.42",
+    "@types/node": "10.9.4",
+    "ts-loader": "4.0.1",
+    "tslib": "1.9.3",
+    "tslint": "5.8.0",
     "typescript": "3.0.3",
-    "vscode": "1.1.21"
+    "vscode": "1.1.21",
+    "webpack": "4.19.0",
+    "webpack-cli": "3.1.0"
   }
 }
