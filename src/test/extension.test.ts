@@ -10,7 +10,7 @@ import * as assert from "assert";
 // as well as import your extension to test it
 import * as vscode from "vscode";
 import * as myExtension from "../extension";
-import { RSTDocumentContentProvider } from "../../old_src/document";
+import { RSTEngine } from "../rstEngine";
 import * as path from "path";
 import * as fs from "fs";
 import { initialize, closeActiveWindows, openFile, samplePath } from './initialize';
@@ -42,8 +42,7 @@ suite("Extension Tests", () => {
     // Defines a Mocha unit test
     test("Example 1 full preview", done => {
         openFile(path.join(samplePath, "example1.rst")).then(editor => {
-            const provider = new RSTDocumentContentProvider(editor.document);
-            provider.preview().then(val => {
+            RSTEngine.preview(editor.document).then(val => {
                 fs.readFile(path.join(samplePath, "example1Full.html"), "utf8", (err, expected) => {
                     assert.equal(val, expected, "Generated HTML does not match expected");
                     done();
@@ -54,7 +53,7 @@ suite("Extension Tests", () => {
 
     // Defines a Mocha unit test
     test("Example 1 to HTML", done => {
-        RSTDocumentContentProvider.compile(path.join(samplePath, "example1.rst")).then(val => {
+        RSTEngine.compile(path.join(samplePath, "example1.rst")).then(val => {
             fs.readFile(path.join(samplePath, "example1.html"), "utf8", (err, expected) => {
                 assert.equal(val, expected, "Generated HTML does not match expected");
                 done();
