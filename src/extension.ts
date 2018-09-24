@@ -6,8 +6,8 @@
 import * as vscode from 'vscode';
 import { CommandManager } from './commandManager';
 import * as commands from './commands/index';
-import { HTMLContentProvider } from './features/previewContentProvider';
-import { HTMLPreviewManager } from './features/previewManager';
+import { RSTContentProvider } from './features/previewContentProvider';
+import { RSTPreviewManager } from './features/previewManager';
 import { Logger } from './logger';
 import { ExtensionContentSecurityPolicyArbiter, PreviewSecuritySelector } from './security';
 
@@ -23,8 +23,8 @@ export function activate(context: vscode.ExtensionContext) {
 	const cspArbiter = new ExtensionContentSecurityPolicyArbiter(context.globalState, context.workspaceState);
 	const logger = new Logger();
 
-	const contentProvider = new HTMLContentProvider(context, cspArbiter, logger);
-	const previewManager = new HTMLPreviewManager(contentProvider, logger);
+	const contentProvider = new RSTContentProvider(context, cspArbiter, logger);
+	const previewManager = new RSTPreviewManager(contentProvider, logger);
 	context.subscriptions.push(previewManager);
 
 

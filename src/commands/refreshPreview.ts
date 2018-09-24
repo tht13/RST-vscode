@@ -4,13 +4,13 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { Command } from '../commandManager';
-import { HTMLPreviewManager } from '../features/previewManager';
+import { RSTPreviewManager } from '../features/previewManager';
 
 export class RefreshPreviewCommand implements Command {
-	public readonly id = 'html.preview.refresh';
+	public readonly id = 'rst.preview.refresh';
 
 	public constructor(
-		private readonly webviewManager: HTMLPreviewManager
+		private readonly webviewManager: RSTPreviewManager
 	) { }
 
 	public execute() {

@@ -104,7 +104,7 @@ document.addEventListener('click', event => {
 			}
 			if (node.href.startsWith('file://') || node.href.startsWith('vscode-resource:')) {
 				const [path, fragment] = node.href.replace(/^(file:\/\/|vscode-resource:)/i, '').split('#');
-				messaging.postCommand('_html.openDocumentLink', [{ path, fragment }]);
+				messaging.postCommand('_rst.openDocumentLink', [{ path, fragment }]);
 				event.preventDefault();
 				event.stopPropagation();
 				break;

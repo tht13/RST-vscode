@@ -6,15 +6,15 @@
 import * as vscode from 'vscode';
 import { Command } from '../commandManager';
 import { PreviewSecuritySelector } from '../security';
-import { isHTMLFile } from '../util/file';
-import { HTMLPreviewManager } from '../features/previewManager';
+import { isRSTFile } from '../util/file';
+import { RSTPreviewManager } from '../features/previewManager';
 
 export class ShowPreviewSecuritySelectorCommand implements Command {
-	public readonly id = 'html.showPreviewSecuritySelector';
+	public readonly id = 'rst.showPreviewSecuritySelector';
 
 	public constructor(
 		private readonly previewSecuritySelector: PreviewSecuritySelector,
-		private readonly previewManager: HTMLPreviewManager
+		private readonly previewManager: RSTPreviewManager
 	) { }
 
 	public execute(resource: string | undefined) {
@@ -23,7 +23,7 @@ export class ShowPreviewSecuritySelectorCommand implements Command {
 		} else if (resource) {
 			const source = vscode.Uri.parse(resource);
 			this.previewSecuritySelector.showSecuritySelectorForResource(source.query ? vscode.Uri.parse(source.query) : source);
-		} else if (vscode.window.activeTextEditor && isHTMLFile(vscode.window.activeTextEditor.document)) {
+		} else if (vscode.window.activeTextEditor && isRSTFile(vscode.window.activeTextEditor.document)) {
 			this.previewSecuritySelector.showSecuritySelectorForResource(vscode.window.activeTextEditor.document.uri);
 		}
 	}

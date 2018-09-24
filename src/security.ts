@@ -5,13 +5,13 @@
 
 import * as vscode from 'vscode';
 
-import { HTMLPreviewManager } from './features/previewManager';
+import { RSTPreviewManager } from './features/previewManager';
 
 import * as nls from 'vscode-nls';
 
 const localize = nls.loadMessageBundle();
 
-export enum HTMLPreviewSecurityLevel {
+export enum RSTPreviewSecurityLevel {
 	Strict = 0,
 	AllowInsecureContent = 1,
 	AllowScriptsAndAllContent = 2,
@@ -19,9 +19,9 @@ export enum HTMLPreviewSecurityLevel {
 }
 
 export interface ContentSecurityPolicyArbiter {
-	getSecurityLevelForResource(resource: vscode.Uri): HTMLPreviewSecurityLevel;
+	getSecurityLevelForResource(resource: vscode.Uri): RSTPreviewSecurityLevel;
 
-	setSecurityLevelForResource(resource: vscode.Uri, level: HTMLPreviewSecurityLevel): Thenable<void>;
+	setSecurityLevelForResource(resource: vscode.Uri, level: RSTPreviewSecurityLevel): Thenable<void>;
 
 	shouldAllowSvgsForResource(resource: vscode.Uri): void;
 
@@ -40,27 +40,27 @@ export class ExtensionContentSecurityPolicyArbiter implements ContentSecurityPol
 		private readonly workspaceState: vscode.Memento
 	) { }
 
-	public getSecurityLevelForResource(resource: vscode.Uri): HTMLPreviewSecurityLevel {
+	public getSecurityLevelForResource(resource: vscode.Uri): RSTPreviewSecurityLevel {
 		// Use new security level setting first
-		const level = this.globalState.get<HTMLPreviewSecurityLevel | undefined>(this.security_level_key + this.getRoot(resource), undefined);
+		const level = this.globalState.get<RSTPreviewSecurityLevel | undefined>(this.security_level_key + this.getRoot(resource), undefined);
 		if (typeof level !== 'undefined') {
 			return level;
 		}
 
 		// Fallback to old trusted workspace setting
 		if (this.globalState.get<boolean>(this.old_trusted_workspace_key + this.getRoot(resource), false)) {
-			return HTMLPreviewSecurityLevel.AllowScriptsAndAllContent;
+			return RSTPreviewSecurityLevel.AllowScriptsAndAllContent;
 		}
-		return HTMLPreviewSecurityLevel.Strict;
+		return RSTPreviewSecurityLevel.Strict;
 	}
 
-	public setSecurityLevelForResource(resource: vscode.Uri, level: HTMLPreviewSecurityLevel): Thenable<void> {
+	public setSecurityLevelForResource(resource: vscode.Uri, level: RSTPreviewSecurityLevel): Thenable<void> {
 		return this.globalState.update(this.security_level_key + this.getRoot(resource), level);
 	}
 
 	public shouldAllowSvgsForResource(resource: vscode.Uri) {
 		const securityLevel = this.getSecurityLevelForResource(resource);
-		return securityLevel === HTMLPreviewSecurityLevel.AllowInsecureContent || securityLevel === HTMLPreviewSecurityLevel.AllowScriptsAndAllContent;
+		return securityLevel === RSTPreviewSecurityLevel.AllowInsecureContent || securityLevel === RSTPreviewSecurityLevel.AllowScriptsAndAllContent;
 	}
 
 	public shouldDisableSecurityWarnings(): boolean {
@@ -91,12 +91,12 @@ export class PreviewSecuritySelector {
 
 	public constructor(
 		private readonly cspArbiter: ContentSecurityPolicyArbiter,
-		private readonly webviewManager: HTMLPreviewManager
+		private readonly webviewManager: RSTPreviewManager
 	) { }
 
 	public async showSecuritySelectorForResource(resource: vscode.Uri): Promise<void> {
 		interface PreviewSecurityPickItem extends vscode.QuickPickItem {
-			readonly type: 'moreinfo' | 'toggle' | HTMLPreviewSecurityLevel;
+			readonly type: 'moreinfo' | 'toggle' | RSTPreviewSecurityLevel;
 		}
 
 		function markActiveWhen(when: boolean): string {
@@ -107,20 +107,20 @@ export class PreviewSecuritySelector {
 		const selection = await vscode.window.showQuickPick<PreviewSecurityPickItem>(
 			[
 				{
-					type: HTMLPreviewSecurityLevel.Strict,
-					label: markActiveWhen(currentSecurityLevel === HTMLPreviewSecurityLevel.Strict) + localize('strict.title', 'Strict'),
+					type: RSTPreviewSecurityLevel.Strict,
+					label: markActiveWhen(currentSecurityLevel === RSTPreviewSecurityLevel.Strict) + localize('strict.title', 'Strict'),
 					description: localize('strict.description', 'Only load secure content'),
 				}, {
-					type: HTMLPreviewSecurityLevel.AllowInsecureLocalContent,
-					label: markActiveWhen(currentSecurityLevel === HTMLPreviewSecurityLevel.AllowInsecureLocalContent) + localize('insecureLocalContent.title', 'Allow insecure local content'),
+					type: RSTPreviewSecurityLevel.AllowInsecureLocalContent,
+					label: markActiveWhen(currentSecurityLevel === RSTPreviewSecurityLevel.AllowInsecureLocalContent) + localize('insecureLocalContent.title', 'Allow insecure local content'),
 					description: localize('insecureLocalContent.description', 'Enable loading content over http served from localhost'),
 				}, {
-					type: HTMLPreviewSecurityLevel.AllowInsecureContent,
-					label: markActiveWhen(currentSecurityLevel === HTMLPreviewSecurityLevel.AllowInsecureContent) + localize('insecureContent.title', 'Allow insecure content'),
+					type: RSTPreviewSecurityLevel.AllowInsecureContent,
+					label: markActiveWhen(currentSecurityLevel === RSTPreviewSecurityLevel.AllowInsecureContent) + localize('insecureContent.title', 'Allow insecure content'),
 					description: localize('insecureContent.description', 'Enable loading content over http'),
 				}, {
-					type: HTMLPreviewSecurityLevel.AllowScriptsAndAllContent,
-					label: markActiveWhen(currentSecurityLevel === HTMLPreviewSecurityLevel.AllowScriptsAndAllContent) + localize('disable.title', 'Disable'),
+					type: RSTPreviewSecurityLevel.AllowScriptsAndAllContent,
+					label: markActiveWhen(currentSecurityLevel === RSTPreviewSecurityLevel.AllowScriptsAndAllContent) + localize('disable.title', 'Disable'),
 					description: localize('disable.description', 'Allow all content and script execution. Not recommended'),
 				}, {
 					type: 'moreinfo',
@@ -136,7 +136,7 @@ export class PreviewSecuritySelector {
 			], {
 				placeHolder: localize(
 					'preview.showPreviewSecuritySelector.title',
-					'Select security settings for HTML previews in this workspace'),
+					'Select security settings for RST previews in this workspace'),
 			});
 		if (!selection) {
 			return;

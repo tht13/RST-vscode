@@ -7,7 +7,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 
 import { Command } from '../commandManager';
-import { isHTMLFile } from '../util/file';
+import { isRSTFile } from '../util/file';
 
 
 export interface OpenDocumentLinkArgs {
@@ -16,7 +16,7 @@ export interface OpenDocumentLinkArgs {
 }
 
 export class OpenDocumentLinkCommand implements Command {
-	private static readonly id = '_html.openDocumentLink';
+	private static readonly id = '_rst.openDocumentLink';
 	public readonly id = OpenDocumentLinkCommand.id;
 
 	public static createCommandUri(
@@ -44,7 +44,7 @@ export class OpenDocumentLinkCommand implements Command {
 
 	private async tryOpen(path: string, args: OpenDocumentLinkArgs) {
 		const resource = vscode.Uri.file(path);
-		if (vscode.window.activeTextEditor && isHTMLFile(vscode.window.activeTextEditor.document) && vscode.window.activeTextEditor.document.uri.fsPath === resource.fsPath) {
+		if (vscode.window.activeTextEditor && isRSTFile(vscode.window.activeTextEditor.document) && vscode.window.activeTextEditor.document.uri.fsPath === resource.fsPath) {
 			return this.tryRevealLine(vscode.window.activeTextEditor, args.fragment);
 		} else {
 			return vscode.workspace.openTextDocument(resource)

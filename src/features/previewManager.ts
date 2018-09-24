@@ -6,26 +6,26 @@
 import * as vscode from 'vscode';
 import { Logger } from '../logger';
 import { disposeAll } from '../util/dispose';
-import { HTMLFileTopmostLineMonitor } from '../util/topmostLineMonitor';
-import { HTMLPreview, PreviewSettings } from './preview';
-import { HTMLPreviewConfigurationManager } from './previewConfig';
-import { HTMLContentProvider } from './previewContentProvider';
+import { RSTFileTopmostLineMonitor } from '../util/topmostLineMonitor';
+import { RSTPreview, PreviewSettings } from './preview';
+import { RSTPreviewConfigurationManager } from './previewConfig';
+import { RSTContentProvider } from './previewContentProvider';
 
 
-export class HTMLPreviewManager implements vscode.WebviewPanelSerializer {
-	private static readonly htmlPreviewActiveContextKey = 'htmlPreviewFocus';
+export class RSTPreviewManager implements vscode.WebviewPanelSerializer {
+	private static readonly rstPreviewActiveContextKey = 'rstPreviewFocus';
 
-	private readonly _topmostLineMonitor = new HTMLFileTopmostLineMonitor();
-	private readonly _previewConfigurations = new HTMLPreviewConfigurationManager();
-	private readonly _previews: HTMLPreview[] = [];
-	private _activePreview: HTMLPreview | undefined = undefined;
+	private readonly _topmostLineMonitor = new RSTFileTopmostLineMonitor();
+	private readonly _previewConfigurations = new RSTPreviewConfigurationManager();
+	private readonly _previews: RSTPreview[] = [];
+	private _activePreview: RSTPreview | undefined = undefined;
 	private readonly _disposables: vscode.Disposable[] = [];
 
 	public constructor(
-		private readonly _contentProvider: HTMLContentProvider,
+		private readonly _contentProvider: RSTContentProvider,
 		private readonly _logger: Logger,
 	) {
-		this._disposables.push(vscode.window.registerWebviewPanelSerializer(HTMLPreview.viewType, this));
+		this._disposables.push(vscode.window.registerWebviewPanelSerializer(RSTPreview.viewType, this));
 	}
 
 	public dispose(): void {
@@ -81,7 +81,7 @@ export class HTMLPreviewManager implements vscode.WebviewPanelSerializer {
 		webview: vscode.WebviewPanel,
 		state: any
 	): Promise<void> {
-		const preview = await HTMLPreview.revive(
+		const preview = await RSTPreview.revive(
 			webview,
 			state,
 			this._contentProvider,
@@ -95,7 +95,7 @@ export class HTMLPreviewManager implements vscode.WebviewPanelSerializer {
 	private getExistingPreview(
 		resource: vscode.Uri,
 		previewSettings: PreviewSettings
-	): HTMLPreview | undefined {
+	): RSTPreview | undefined {
 		return this._previews.find(preview =>
 			preview.matchesResource(resource, previewSettings.previewColumn, previewSettings.locked));
 	}
@@ -103,8 +103,8 @@ export class HTMLPreviewManager implements vscode.WebviewPanelSerializer {
 	private createNewPreview(
 		resource: vscode.Uri,
 		previewSettings: PreviewSettings
-	): HTMLPreview {
-		const preview = HTMLPreview.create(
+	): RSTPreview {
+		const preview = RSTPreview.create(
 			resource,
 			previewSettings.previewColumn,
 			previewSettings.locked,
@@ -119,8 +119,8 @@ export class HTMLPreviewManager implements vscode.WebviewPanelSerializer {
 	}
 
 	private registerPreview(
-		preview: HTMLPreview
-	): HTMLPreview {
+		preview: RSTPreview
+	): RSTPreview {
 		this._previews.push(preview);
 
 		preview.onDispose(() => {
@@ -146,7 +146,7 @@ export class HTMLPreviewManager implements vscode.WebviewPanelSerializer {
 	}
 
 	private setPreviewActiveContext(value: boolean) {
-		vscode.commands.executeCommand('setContext', HTMLPreviewManager.htmlPreviewActiveContextKey, value);
+		vscode.commands.executeCommand('setContext', RSTPreviewManager.rstPreviewActiveContextKey, value);
 	}
 }
 

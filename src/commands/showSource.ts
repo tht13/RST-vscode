@@ -5,13 +5,13 @@
 
 import * as vscode from 'vscode';
 import { Command } from '../commandManager';
-import { HTMLPreviewManager } from '../features/previewManager';
+import { RSTPreviewManager } from '../features/previewManager';
 
 export class ShowSourceCommand implements Command {
-	public readonly id = 'html.showSource';
+	public readonly id = 'rst.showSource';
 
 	public constructor(
-		private readonly previewManager: HTMLPreviewManager
+		private readonly previewManager: RSTPreviewManager
 	) { }
 
 	public execute() {

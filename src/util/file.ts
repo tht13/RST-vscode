@@ -5,6 +5,6 @@
 
 import * as vscode from 'vscode';
 
-export function isHTMLFile(document: vscode.TextDocument) {
-	return document.languageId === 'html';
+export function isRSTFile(document: vscode.TextDocument) {
+	return document.languageId === 'rst';
 }

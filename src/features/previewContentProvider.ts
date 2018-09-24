@@ -10,8 +10,8 @@ import * as nls from 'vscode-nls';
 const localize = nls.loadMessageBundle();
 
 import { Logger } from '../logger';
-import { ContentSecurityPolicyArbiter, HTMLPreviewSecurityLevel } from '../security';
-import { HTMLPreviewConfigurationManager, HTMLPreviewConfiguration } from './previewConfig';
+import { ContentSecurityPolicyArbiter, RSTPreviewSecurityLevel } from '../security';
+import { RSTPreviewConfigurationManager, RSTPreviewConfiguration } from './previewConfig';
 import * as cheerio from "cheerio";
 import { RSTEngine } from '../rstEngine';
 
@@ -35,7 +35,7 @@ const previewStrings = {
 		'Content Disabled Security Warning')
 };
 
-export class HTMLContentProvider {
+export class RSTContentProvider {
 	constructor(
 		private readonly context: vscode.ExtensionContext,
 		private readonly cspArbiter: ContentSecurityPolicyArbiter,
@@ -46,7 +46,7 @@ export class HTMLContentProvider {
 
 	public async provideTextDocumentContent(
 		htmlDocument: vscode.TextDocument,
-		previewConfigurations: HTMLPreviewConfigurationManager,
+		previewConfigurations: RSTPreviewConfigurationManager,
 		initialLine: number | undefined = undefined,
 		state?: any
 	): Promise<string> {
@@ -129,7 +129,7 @@ export class HTMLContentProvider {
 			.toString();
 	}
 
-	private getStyles(resource: vscode.Uri, config: HTMLPreviewConfiguration): string {
+	private getStyles(resource: vscode.Uri, config: RSTPreviewConfiguration): string {
 		if (Array.isArray(config.styles)) {
 			return config.styles.map(style => {
 				return `<link rel="stylesheet" class="code-user-style" data-source="${style.replace(/"/g, '&quot;')}" href="${this.fixHref(resource, style)}" type="text/css" media="screen">`;
@@ -140,16 +140,16 @@ export class HTMLContentProvider {
 
 	private getCspForResource(resource: vscode.Uri, nonce: string): string {
 		switch (this.cspArbiter.getSecurityLevelForResource(resource)) {
-			case HTMLPreviewSecurityLevel.AllowInsecureContent:
+			case RSTPreviewSecurityLevel.AllowInsecureContent:
 				return `<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src vscode-resource: http: https: data:; media-src vscode-resource: http: https: data:; script-src https: vscode-resource:; style-src vscode-resource: 'unsafe-inline' http: https: data:; font-src vscode-resource: http: https: data:;">`;
 
-			case HTMLPreviewSecurityLevel.AllowInsecureLocalContent:
+			case RSTPreviewSecurityLevel.AllowInsecureLocalContent:
 				return `<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src vscode-resource: https: data: http://localhost:* http://127.0.0.1:*; media-src vscode-resource: https: data: http://localhost:* http://127.0.0.1:*; script-src https: vscode-resource:; style-src vscode-resource: 'unsafe-inline' https: data: http://localhost:* http://127.0.0.1:*; font-src vscode-resource: https: data: http://localhost:* http://127.0.0.1:*;">`;
 
-			case HTMLPreviewSecurityLevel.AllowScriptsAndAllContent:
+			case RSTPreviewSecurityLevel.AllowScriptsAndAllContent:
 				return '';
 
-			case HTMLPreviewSecurityLevel.Strict:
+			case RSTPreviewSecurityLevel.Strict:
 			default:
 				return `<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src vscode-resource: https: data:; media-src vscode-resource: https: data:; script-src https: vscode-resource:; style-src vscode-resource: 'unsafe-inline' https: data:; font-src vscode-resource: https: data:;">`;
 		}

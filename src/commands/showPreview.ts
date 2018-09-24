@@ -6,7 +6,7 @@
 import * as vscode from 'vscode';
 
 import { Command } from '../commandManager';
-import { HTMLPreviewManager } from '../features/previewManager';
+import { RSTPreviewManager } from '../features/previewManager';
 import { PreviewSettings } from '../features/preview';
 
 interface ShowPreviewSettings {
@@ -15,14 +15,14 @@ interface ShowPreviewSettings {
 }
 
 async function showPreview(
-	webviewManager: HTMLPreviewManager,
+	webviewManager: RSTPreviewManager,
 	uri: vscode.Uri | undefined,
 	previewSettings: ShowPreviewSettings,
 ): Promise<any> {
 	let resource = uri;
 	if (!(resource instanceof vscode.Uri)) {
 		if (vscode.window.activeTextEditor) {
-			// we are relaxed and don't check for html files
+			// we are relaxed and don't check for rst files
 			resource = vscode.window.activeTextEditor.document.uri;
 		}
 	}
@@ -30,7 +30,7 @@ async function showPreview(
 	if (!(resource instanceof vscode.Uri)) {
 		if (!vscode.window.activeTextEditor) {
 			// this is most likely toggling the preview
-			return vscode.commands.executeCommand('html.showSource');
+			return vscode.commands.executeCommand('rst.showSource');
 		}
 		// nothing found that could be shown or toggled
 		return;
@@ -46,10 +46,10 @@ async function showPreview(
 }
 
 export class ShowPreviewCommand implements Command {
-	public readonly id = 'html.showPreview';
+	public readonly id = 'rst.showPreview';
 
 	public constructor(
-		private readonly webviewManager: HTMLPreviewManager,
+		private readonly webviewManager: RSTPreviewManager,
 	) { }
 
 	public execute(mainUri?: vscode.Uri, allUris?: vscode.Uri[], previewSettings?: PreviewSettings) {
@@ -63,10 +63,10 @@ export class ShowPreviewCommand implements Command {
 }
 
 export class ShowPreviewToSideCommand implements Command {
-	public readonly id = 'html.showPreviewToSide';
+	public readonly id = 'rst.showPreviewToSide';
 
 	public constructor(
-		private readonly webviewManager: HTMLPreviewManager,
+		private readonly webviewManager: RSTPreviewManager,
 	) { }
 
 	public execute(uri?: vscode.Uri, previewSettings?: PreviewSettings) {
@@ -79,10 +79,10 @@ export class ShowPreviewToSideCommand implements Command {
 
 
 export class ShowLockedPreviewToSideCommand implements Command {
-	public readonly id = 'html.showLockedPreviewToSide';
+	public readonly id = 'rst.showLockedPreviewToSide';
 
 	public constructor(
-		private readonly webviewManager: HTMLPreviewManager
+		private readonly webviewManager: RSTPreviewManager
 	) { }
 
 	public execute(uri?: vscode.Uri) {

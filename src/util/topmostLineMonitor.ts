@@ -5,9 +5,9 @@
 
 import * as vscode from 'vscode';
 import { disposeAll } from '../util/dispose';
-import { isHTMLFile } from './file';
+import { isRSTFile } from './file';
 
-export class HTMLFileTopmostLineMonitor {
+export class RSTFileTopmostLineMonitor {
 	private readonly disposables: vscode.Disposable[] = [];
 
 	private readonly pendingUpdates = new Map<string, number>();
@@ -16,7 +16,7 @@ export class HTMLFileTopmostLineMonitor {
 
 	constructor() {
 		vscode.window.onDidChangeTextEditorVisibleRanges(event => {
-			if (isHTMLFile(event.textEditor.document)) {
+			if (isRSTFile(event.textEditor.document)) {
 				const line = getVisibleLine(event.textEditor);
 				if (typeof line === 'number') {
 					this.updateLine(event.textEditor.document.uri, line);

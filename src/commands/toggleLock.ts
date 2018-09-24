@@ -4,13 +4,13 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { Command } from '../commandManager';
-import { HTMLPreviewManager } from '../features/previewManager';
+import { RSTPreviewManager } from '../features/previewManager';
 
 export class ToggleLockCommand implements Command {
-	public readonly id = 'html.preview.toggleLock';
+	public readonly id = 'rst.preview.toggleLock';
 
 	public constructor(
-		private readonly previewManager: HTMLPreviewManager
+		private readonly previewManager: RSTPreviewManager
 	) { }
 
 	public execute() {

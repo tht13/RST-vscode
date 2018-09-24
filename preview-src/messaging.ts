@@ -7,13 +7,13 @@ import { getSettings } from './settings';
 
 export interface MessagePoster {
 	/**
-	 * Post a message to the html extension
+	 * Post a message to the rst extension
 	 */
 	postMessage(type: string, body: object): void;
 
 
 	/**
-	 * Post a command to be executed to the html extension
+	 * Post a command to be executed to the rst extension
 	 */
 	postCommand(command: string, args: any[]): void;
 }

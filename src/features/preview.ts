@@ -7,19 +7,19 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 
 import { Logger } from '../logger';
-import { HTMLContentProvider } from './previewContentProvider';
+import { RSTContentProvider } from './previewContentProvider';
 import { disposeAll } from '../util/dispose';
 
 import * as nls from 'vscode-nls';
-import { getVisibleLine, HTMLFileTopmostLineMonitor } from '../util/topmostLineMonitor';
-import { HTMLPreviewConfigurationManager } from './previewConfig';
-import { isHTMLFile } from '../util/file';
+import { getVisibleLine, RSTFileTopmostLineMonitor } from '../util/topmostLineMonitor';
+import { RSTPreviewConfigurationManager } from './previewConfig';
+import { isRSTFile } from '../util/file';
 import { getExtensionPath } from '../extension';
 const localize = nls.loadMessageBundle();
 
-export class HTMLPreview {
+export class RSTPreview {
 
-	public static viewType = 'html.preview';
+	public static viewType = 'rst.preview';
 
 	private _resource: vscode.Uri;
 	private _locked: boolean;
@@ -37,16 +37,16 @@ export class HTMLPreview {
 	public static async revive(
 		webview: vscode.WebviewPanel,
 		state: any,
-		contentProvider: HTMLContentProvider,
-		previewConfigurations: HTMLPreviewConfigurationManager,
+		contentProvider: RSTContentProvider,
+		previewConfigurations: RSTPreviewConfigurationManager,
 		logger: Logger,
-		topmostLineMonitor: HTMLFileTopmostLineMonitor,
-	): Promise<HTMLPreview> {
+		topmostLineMonitor: RSTFileTopmostLineMonitor,
+	): Promise<RSTPreview> {
 		const resource = vscode.Uri.parse(state.resource);
 		const locked = state.locked;
 		const line = state.line;
 
-		const preview = new HTMLPreview(
+		const preview = new RSTPreview(
 			webview,
 			resource,
 			locked,
@@ -55,7 +55,7 @@ export class HTMLPreview {
 			logger,
 			topmostLineMonitor,);
 
-		preview.editor.webview.options = HTMLPreview.getWebviewOptions(resource);
+		preview.editor.webview.options = RSTPreview.getWebviewOptions(resource);
 
 		if (!isNaN(line)) {
 			preview.line = line;
@@ -68,20 +68,20 @@ export class HTMLPreview {
 		resource: vscode.Uri,
 		previewColumn: vscode.ViewColumn,
 		locked: boolean,
-		contentProvider: HTMLContentProvider,
-		previewConfigurations: HTMLPreviewConfigurationManager,
+		contentProvider: RSTContentProvider,
+		previewConfigurations: RSTPreviewConfigurationManager,
 		logger: Logger,
-		topmostLineMonitor: HTMLFileTopmostLineMonitor,
-	): HTMLPreview {
+		topmostLineMonitor: RSTFileTopmostLineMonitor,
+	): RSTPreview {
 		const webview = vscode.window.createWebviewPanel(
-			HTMLPreview.viewType,
-			HTMLPreview.getPreviewTitle(resource, locked),
+			RSTPreview.viewType,
+			RSTPreview.getPreviewTitle(resource, locked),
 			previewColumn, {
 				enableFindWidget: true,
-				...HTMLPreview.getWebviewOptions(resource)
+				...RSTPreview.getWebviewOptions(resource)
 			});
 
-		return new HTMLPreview(
+		return new RSTPreview(
 			webview,
 			resource,
 			locked,
@@ -95,10 +95,10 @@ export class HTMLPreview {
 		webview: vscode.WebviewPanel,
 		resource: vscode.Uri,
 		locked: boolean,
-		private readonly _contentProvider: HTMLContentProvider,
-		private readonly _previewConfigurations: HTMLPreviewConfigurationManager,
+		private readonly _contentProvider: RSTContentProvider,
+		private readonly _previewConfigurations: RSTPreviewConfigurationManager,
 		private readonly _logger: Logger,
-		topmostLineMonitor: HTMLFileTopmostLineMonitor,
+		topmostLineMonitor: RSTFileTopmostLineMonitor,
 	) {
 		this._resource = resource;
 		this._locked = locked;
@@ -156,7 +156,7 @@ export class HTMLPreview {
 		}, null, this.disposables);
 
 		vscode.window.onDidChangeActiveTextEditor(editor => {
-			if (editor && isHTMLFile(editor.document) && !this._locked) {
+			if (editor && isRSTFile(editor.document) && !this._locked) {
 				this.update(editor.document.uri);
 			}
 		}, null, this.disposables);
@@ -253,7 +253,7 @@ export class HTMLPreview {
 		}
 	}
 
-	public matches(otherPreview: HTMLPreview): boolean {
+	public matches(otherPreview: RSTPreview): boolean {
 		return this.matchesResource(otherPreview._resource, otherPreview.position, otherPreview._locked);
 	}
 
@@ -263,7 +263,7 @@ export class HTMLPreview {
 
 	public toggleLock() {
 		this._locked = !this._locked;
-		this.editor.title = HTMLPreview.getPreviewTitle(this._resource, this._locked);
+		this.editor.title = RSTPreview.getPreviewTitle(this._resource, this._locked);
 	}
 
 	private get iconPath() {
@@ -295,7 +295,7 @@ export class HTMLPreview {
 		}
 
 		if (typeof topLine === 'number') {
-			this._logger.log('updateForView', { htmlFile: resource });
+			this._logger.log('updateForView', { rstFile: resource });
 			this.line = topLine;
 			this.postMessage({
 				type: 'updateView',
@@ -329,9 +329,9 @@ export class HTMLPreview {
 		this.currentVersion = { resource, version: document.version };
 		const content: string = await this._contentProvider.provideTextDocumentContent(document, this._previewConfigurations, this.line, this.state);
 		if (this._resource === resource) {
-			this.editor.title = HTMLPreview.getPreviewTitle(this._resource, this._locked);
+			this.editor.title = RSTPreview.getPreviewTitle(this._resource, this._locked);
 			this.editor.iconPath = this.iconPath;
-			this.editor.webview.options = HTMLPreview.getWebviewOptions(resource);
+			this.editor.webview.options = RSTPreview.getWebviewOptions(resource);
 			this.editor.webview.html = content;
 		}
 	}
@@ -342,7 +342,7 @@ export class HTMLPreview {
 		return {
 			enableScripts: true,
 			enableCommandUris: true,
-			localResourceRoots: HTMLPreview.getLocalResourceRoots(resource)
+			localResourceRoots: RSTPreview.getLocalResourceRoots(resource)
 		};
 	}
 

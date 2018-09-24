@@ -5,9 +5,9 @@
 
 import * as vscode from 'vscode';
 
-export class HTMLPreviewConfiguration {
+export class RSTPreviewConfiguration {
 	public static getForResource(resource: vscode.Uri) {
-		return new HTMLPreviewConfiguration(resource);
+		return new RSTPreviewConfiguration(resource);
 	}
 
 	public readonly scrollBeyondLastLine: boolean;
@@ -23,27 +23,27 @@ export class HTMLPreviewConfiguration {
 
 	private constructor(resource: vscode.Uri) {
 		const editorConfig = vscode.workspace.getConfiguration('editor', resource);
-		const htmlConfig = vscode.workspace.getConfiguration('html', resource);
-		const htmlEditorConfig = vscode.workspace.getConfiguration('[html]', resource);
+		const rstConfig = vscode.workspace.getConfiguration('rst', resource);
+		const rstEditorConfig = vscode.workspace.getConfiguration('[rst]', resource);
 
 		this.scrollBeyondLastLine = editorConfig.get<boolean>('scrollBeyondLastLine', false);
 
 		this.wordWrap = editorConfig.get<string>('wordWrap', 'off') !== 'off';
-		if (htmlEditorConfig && htmlEditorConfig['editor.wordWrap']) {
-			this.wordWrap = htmlEditorConfig['editor.wordWrap'] !== 'off';
+		if (rstEditorConfig && rstEditorConfig['editor.wordWrap']) {
+			this.wordWrap = rstEditorConfig['editor.wordWrap'] !== 'off';
 		}
 
-		this.previewFrontMatter = htmlConfig.get<string>('previewFrontMatter', 'hide');
-		this.scrollPreviewWithEditor = !!htmlConfig.get<boolean>('preview.scrollPreviewWithEditor', true);
-		this.scrollEditorWithPreview = !!htmlConfig.get<boolean>('preview.scrollEditorWithPreview', true);
-		this.lineBreaks = !!htmlConfig.get<boolean>('preview.breaks', false);
-		this.doubleClickToSwitchToEditor = !!htmlConfig.get<boolean>('preview.doubleClickToSwitchToEditor', true);
-		this.markEditorSelection = !!htmlConfig.get<boolean>('preview.markEditorSelection', true);
+		this.previewFrontMatter = rstConfig.get<string>('previewFrontMatter', 'hide');
+		this.scrollPreviewWithEditor = !!rstConfig.get<boolean>('preview.scrollPreviewWithEditor', true);
+		this.scrollEditorWithPreview = !!rstConfig.get<boolean>('preview.scrollEditorWithPreview', true);
+		this.lineBreaks = !!rstConfig.get<boolean>('preview.breaks', false);
+		this.doubleClickToSwitchToEditor = !!rstConfig.get<boolean>('preview.doubleClickToSwitchToEditor', true);
+		this.markEditorSelection = !!rstConfig.get<boolean>('preview.markEditorSelection', true);
 
-		this.styles = htmlConfig.get<string[]>('styles', []);
+		this.styles = rstConfig.get<string[]>('styles', []);
 	}
 
-	public isEqualTo(otherConfig: HTMLPreviewConfiguration) {
+	public isEqualTo(otherConfig: RSTPreviewConfiguration) {
 		for (let key in this) {
 			if (this.hasOwnProperty(key) && key !== 'styles') {
 				if (this[key] !== otherConfig[key]) {
@@ -68,13 +68,13 @@ export class HTMLPreviewConfiguration {
 	[key: string]: any;
 }
 
-export class HTMLPreviewConfigurationManager {
-	private readonly previewConfigurationsForWorkspaces = new Map<string, HTMLPreviewConfiguration>();
+export class RSTPreviewConfigurationManager {
+	private readonly previewConfigurationsForWorkspaces = new Map<string, RSTPreviewConfiguration>();
 
 	public loadAndCacheConfiguration(
 		resource: vscode.Uri
-	): HTMLPreviewConfiguration {
-		const config = HTMLPreviewConfiguration.getForResource(resource);
+	): RSTPreviewConfiguration {
+		const config = RSTPreviewConfiguration.getForResource(resource);
 		this.previewConfigurationsForWorkspaces.set(this.getKey(resource), config);
 		return config;
 	}
@@ -84,7 +84,7 @@ export class HTMLPreviewConfigurationManager {
 	): boolean {
 		const key = this.getKey(resource);
 		const currentConfig = this.previewConfigurationsForWorkspaces.get(key);
-		const newConfig = HTMLPreviewConfiguration.getForResource(resource);
+		const newConfig = RSTPreviewConfiguration.getForResource(resource);
 		return (!currentConfig || !currentConfig.isEqualTo(newConfig));
 	}
 
