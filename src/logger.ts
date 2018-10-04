@@ -6,12 +6,12 @@
 import * as vscode from 'vscode';
 import { lazy } from './util/lazy';
 
-enum Trace {
+export enum Trace {
 	Off,
 	Verbose
 }
 
-namespace Trace {
+export namespace Trace {
 	export function fromString(value: string): Trace {
 		value = value.toLowerCase();
 		switch (value) {

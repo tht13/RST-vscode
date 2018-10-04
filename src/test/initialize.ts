@@ -20,7 +20,7 @@ async function checkValidFile(file: string): Promise<boolean> {
 
 export async function initialize(): Promise<vscode.TextDocument> {
   let dummyFile = path.join(samplePath, "example1.rst");
-  await checkValidFile(dummyFile)
+  await checkValidFile(dummyFile);
   return vscode.workspace.openTextDocument(dummyFile);
 }
 

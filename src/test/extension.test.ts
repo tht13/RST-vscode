@@ -14,13 +14,24 @@ import { RSTEngine } from "../rstEngine";
 import * as path from "path";
 import * as fs from "fs";
 import { initialize, closeActiveWindows, openFile, samplePath } from './initialize';
+import { Python } from '../python';
+import { Logger, Trace } from '../logger';
 
 // Defines a Mocha test suite to group tests of similar kind together
+let engine: RSTEngine;
+let python: Python;
+let logger: Logger = {
+    log: (msg: string) => void 0,
+    updateConfiguration: () => void 0
+} as any;
 suite("Extension Tests", () => {
-    suiteSetup(done => {
-        initialize().then((a) => {
-            done();
-        }, done);
+    
+    suiteSetup(async done => {
+        await initialize();
+        python = new Python(logger);
+        await python.awaitReady();
+        engine = new RSTEngine(python, logger);
+        done();
     });
 
     suiteTeardown(done => {
@@ -42,7 +53,7 @@ suite("Extension Tests", () => {
     // Defines a Mocha unit test
     test("Example 1 full preview", done => {
         openFile(path.join(samplePath, "example1.rst")).then(editor => {
-            RSTEngine.preview(editor.document).then(val => {
+            engine.preview(editor.document).then(val => {
                 fs.readFile(path.join(samplePath, "example1Full.html"), "utf8", (err, expected) => {
                     assert.equal(val, expected, "Generated HTML does not match expected");
                     done();
@@ -53,7 +64,7 @@ suite("Extension Tests", () => {
 
     // Defines a Mocha unit test
     test("Example 1 to HTML", done => {
-        RSTEngine.compile(path.join(samplePath, "example1.rst")).then(val => {
+        engine.compile(path.join(samplePath, "example1.rst")).then(val => {
             fs.readFile(path.join(samplePath, "example1.html"), "utf8", (err, expected) => {
                 assert.equal(val, expected, "Generated HTML does not match expected");
                 done();
