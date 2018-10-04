@@ -1,7 +1,5 @@
 .vscode/**
-typings/**
 out/test/**
-test/**
 src/**
 **/*.map
 .gitignore
@@ -12,3 +10,4 @@ tslint.json
 webpack.config.js
 .git/**
 .vscode-test/**
+test-resources/**

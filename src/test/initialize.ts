@@ -3,8 +3,7 @@ import * as vscode from "vscode";
 import * as assert from "assert";
 import * as fs from "fs";
 
-
-export const samplePath = path.join(__dirname, "..", "..", "test", "samples");
+export const samplePath = path.join(__dirname, "..", "..", "test-resources");
 
 async function checkValidFile(file: string): Promise<boolean> {
   return new Promise<boolean>((resolve, reject) => {
@@ -26,14 +25,13 @@ export async function initialize(): Promise<vscode.TextDocument> {
 
 export async function openFile(file: string) {
   await checkValidFile(file);
-  return vscode.workspace.openTextDocument(file).then(
-    document => vscode.window.showTextDocument(document)
-  );
+  const document = await vscode.workspace.openTextDocument(file);
+  return vscode.window.showTextDocument(document);
 }
 
 export async function closeActiveWindows(): Promise<any> {
   // https://github.com/Microsoft/vscode/blob/master/extensions/vscode-api-tests/src/utils.ts
-  return new Promise((c, e) => {
+  await new Promise(async (c, e) => {
     if (vscode.window.visibleTextEditors.length === 0) {
       return c();
     }
@@ -50,13 +48,13 @@ export async function closeActiveWindows(): Promise<any> {
       c();
     }, 10);
 
-    vscode.commands.executeCommand('workbench.action.closeAllEditors')
-      .then(() => null, (err: any) => {
-        clearInterval(interval);
-        e(err);
-      });
-  }).then(() => {
-    assert.equal(vscode.window.visibleTextEditors.length, 0);
-    assert(!vscode.window.activeTextEditor);
+    try {
+      await vscode.commands.executeCommand("workbench.action.closeAllEditors");
+    } catch (e) {
+      clearInterval(interval);
+      e(e);
+    }
   });
+  assert.equal(vscode.window.visibleTextEditors.length, 0);
+  assert(!vscode.window.activeTextEditor);
 }

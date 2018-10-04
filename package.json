@@ -1,33 +1,33 @@
 {
-  "name": "rst-vscode",
+	"name": "rst-vscode",
 	"displayName": "%displayName%",
 	"description": "%description%",
-  "version": "2.1.0",
-  "publisher": "tht13",
-  "author": "Thomas Haakon Townsend",
-  "license": "MIT",
-  "readme": "README.md",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/tht13/RST-vscode"
-  },
-  "galleryBanner": {
-    "color": "#78d6f0",
-    "theme": "light"
-  },
-  "bugs": "https://github.com/tht13/RST-vscode/issues",
-  "homepage": "https://github.com/tht13/RST-vscode/blob/master/README.md",
-  "icon": "media/icon.png",
-  "main": "./out/extension.js",
-  "engines": {
-    "vscode": "^1.26.0"
-  },
-  "categories": [
-    "Programming Languages",
-    "Other"
-  ],
-  "activationEvents": [
-    "workspaceContains:**/*.rst",
+	"version": "2.1.0",
+	"publisher": "tht13",
+	"author": "Thomas Haakon Townsend",
+	"license": "MIT",
+	"readme": "README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/tht13/RST-vscode"
+	},
+	"galleryBanner": {
+		"color": "#78d6f0",
+		"theme": "light"
+	},
+	"bugs": "https://github.com/tht13/RST-vscode/issues",
+	"homepage": "https://github.com/tht13/RST-vscode/blob/master/README.md",
+	"icon": "media/icon.png",
+	"main": "./out/extension.js",
+	"engines": {
+		"vscode": "^1.26.0"
+	},
+	"categories": [
+		"Programming Languages",
+		"Other"
+	],
+	"activationEvents": [
+		"workspaceContains:**/*.rst",
 		"onLanguage:rst",
 		"onCommand:rst.preview.toggleLock",
 		"onCommand:rst.preview.refresh",
@@ -37,22 +37,22 @@
 		"onCommand:rst.showSource",
 		"onCommand:rst.showPreviewSecuritySelector",
 		"onWebviewPanel:rst.preview"
-  ],
-  "contributes": {
-    "languages": [
-      {
-        "id": "rst",
-        "aliases": [
-          "RST",
-          "ReStructured Text"
-        ],
-        "extensions": [
-          ".rst",
-          ".rest"
-        ]
-      }
-    ],
-    "commands": [
+	],
+	"contributes": {
+		"languages": [
+			{
+				"id": "rst",
+				"aliases": [
+					"RST",
+					"ReStructured Text"
+				],
+				"extensions": [
+					".rst",
+					".rest"
+				]
+			}
+		],
+		"commands": [
 			{
 				"command": "rst.showPreview",
 				"title": "%rst.preview.title%",
@@ -244,43 +244,44 @@
 				}
 			}
 		},
-    "grammars": [
-      {
-        "language": "rst",
-        "path": "./syntaxes/restructuredtext.tmlanguage",
-        "scopeName": "text.restructuredtext"
-      }
-    ]
-  },
-  "scripts": {
-    "vscode:prepublish": "npm run compile",
-    "compile": "npm run build-ext && npm run build-preview",
-    "build-ext": "npx tsc -p ./tsconfig.json",
-    "build-preview": "./node_modules/.bin/webpack-cli",
-    "watch": "npx tsc -watch -p ./tsconfig.json",
-    "postinstall": "node ./node_modules/vscode/bin/install",
-    "test": "npm run compile && node ./node_modules/vscode/bin/test",
-    "preversion": "npm run compile",
-    "version": "./node_modules/.bin/changes",
-    "postversion": "git push --follow-tags"
-  },
-  "dependencies": {
-    "cheerio": "1.0.0-rc.2",
-    "lodash.throttle": "4.1.1",
-    "vscode-nls": "4.0.0"
-  },
-  "devDependencies": {
-    "@studio/changes": "1.7.0",
-    "@types/cheerio": "0.22.9",
-    "@types/lodash.throttle": "4.1.4",
-    "@types/mocha": "5.2.5",
-    "@types/node": "10.11.3",
-    "ts-loader": "5.2.1",
-    "tslib": "1.9.3",
-    "tslint": "5.11.0",
-    "typescript": "3.1.1",
-    "vscode": "1.1.21",
-    "webpack": "4.20.0",
-    "webpack-cli": "3.1.2"
-  }
+		"grammars": [
+			{
+				"language": "rst",
+				"path": "./syntaxes/restructuredtext.tmlanguage",
+				"scopeName": "text.restructuredtext"
+			}
+		]
+	},
+	"scripts": {
+		"vscode:prepublish": "npm run compile",
+		"compile": "npm run build-ext && npm run build-preview",
+		"build-ext": "npx tsc -p ./tsconfig.json",
+		"build-preview": "./node_modules/.bin/webpack-cli",
+		"watch": "npx tsc -watch -p ./tsconfig.json",
+		"postinstall": "node ./node_modules/vscode/bin/install",
+		"test": "npm run compile && node ./node_modules/vscode/bin/test",
+		"preversion": "npm run compile",
+		"version": "./node_modules/.bin/changes",
+		"postversion": "git push --follow-tags"
+	},
+	"dependencies": {
+		"cheerio": "1.0.0-rc.2",
+		"lodash.throttle": "4.1.1",
+		"vscode-nls": "4.0.0"
+	},
+	"devDependencies": {
+		"@studio/changes": "1.7.0",
+		"@types/cheerio": "0.22.9",
+		"@types/lodash.throttle": "4.1.4",
+		"@types/mocha": "5.2.5",
+		"@types/node": "10.11.3",
+		"mocha": "5.2.0",
+		"ts-loader": "5.2.1",
+		"tslib": "1.9.3",
+		"tslint": "5.11.0",
+		"typescript": "3.1.1",
+		"vscode": "1.1.21",
+		"webpack": "4.20.0",
+		"webpack-cli": "3.1.2"
+	}
 }
