@@ -10,6 +10,7 @@ import { RSTContentProvider } from './features/previewContentProvider';
 import { RSTPreviewManager } from './features/previewManager';
 import { Logger } from './logger';
 import { ExtensionContentSecurityPolicyArbiter, PreviewSecuritySelector } from './security';
+import { Python } from './python';
 
 let extensionPath = "";
 
@@ -17,8 +18,15 @@ export function getExtensionPath(): string {
 	return extensionPath;
 }
 
+let python: Python;
+
+export function getPythonInstance(): Python {
+	return python;
+}
+
 export function activate(context: vscode.ExtensionContext) {
 	extensionPath = context.extensionPath;
+	Python.getInstance().then(p => python = p);
 
 	const cspArbiter = new ExtensionContentSecurityPolicyArbiter(context.globalState, context.workspaceState);
 	const logger = new Logger();

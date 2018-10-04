@@ -1,6 +1,7 @@
 import { Event, Uri, EventEmitter, TextDocument } from "vscode";
 import * as path from "path";
 import { exec, ExecException } from "child_process";
+import { getPythonInstance } from "./extension";
 
 export class RSTEngine {
   private constructor() {}
@@ -40,31 +41,10 @@ export class RSTEngine {
   }
 
   public static compile(fileName: string): Promise<string> {
-    return new Promise<string>((resolve, reject) => {
-      let cmd: string = [
-        "python",
-        path.join(__dirname, "..", "python", "preview.py"),
-        fileName
-      ].join(" ");
-      exec(
-        cmd,
-        (error: ExecException | null, stdout: string, stderr: string) => {
-          if (error) {
-            let errorMessage: string = [
-              error.name,
-              error.message,
-              error.stack,
-              "",
-              stderr.toString()
-            ].join("\n");
-            console.error(errorMessage);
-            reject(errorMessage);
-          } else {
-            resolve(stdout.toString());
-          }
-        }
-      );
-    });
+    return getPythonInstance().exec(
+      path.join(__dirname, "..", "python", "preview.py"),
+      fileName
+    );
   }
 
   public static async preview(doc: TextDocument): Promise<string> {
