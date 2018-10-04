@@ -18,7 +18,7 @@
   "bugs": "https://github.com/tht13/RST-vscode/issues",
   "homepage": "https://github.com/tht13/RST-vscode/blob/master/README.md",
   "icon": "media/icon.png",
-  "main": "./out/src/extension",
+  "main": "./out/extension",
   "engines": {
     "vscode": "^1.26.0"
   },
@@ -27,6 +27,7 @@
     "Other"
   ],
   "activationEvents": [
+    "workspaceContains:**/*.rst",
     "onCommand:rst.preview",
     "onCommand:rst.previewToSide",
     "onCommand:rst.source"
@@ -41,8 +42,7 @@
         ],
         "extensions": [
           ".rst",
-          ".rest",
-          ".hrst"
+          ".rest"
         ]
       }
     ],
