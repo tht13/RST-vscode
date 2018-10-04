@@ -10,10 +10,6 @@ export class RSTPreviewConfiguration {
 		return new RSTPreviewConfiguration(resource);
 	}
 
-	public readonly scrollBeyondLastLine: boolean;
-	public readonly wordWrap: boolean;
-	public readonly previewFrontMatter: string;
-	public readonly lineBreaks: boolean;
 	public readonly doubleClickToSwitchToEditor: boolean;
 	public readonly scrollEditorWithPreview: boolean;
 	public readonly scrollPreviewWithEditor: boolean;
@@ -26,19 +22,11 @@ export class RSTPreviewConfiguration {
 		const rstConfig = vscode.workspace.getConfiguration('rst', resource);
 		const rstEditorConfig = vscode.workspace.getConfiguration('[rst]', resource);
 
-		this.scrollBeyondLastLine = editorConfig.get<boolean>('scrollBeyondLastLine', false);
-
-		this.wordWrap = editorConfig.get<string>('wordWrap', 'off') !== 'off';
-		if (rstEditorConfig && rstEditorConfig['editor.wordWrap']) {
-			this.wordWrap = rstEditorConfig['editor.wordWrap'] !== 'off';
-		}
-
-		this.previewFrontMatter = rstConfig.get<string>('previewFrontMatter', 'hide');
 		this.scrollPreviewWithEditor = !!rstConfig.get<boolean>('preview.scrollPreviewWithEditor', true);
 		this.scrollEditorWithPreview = !!rstConfig.get<boolean>('preview.scrollEditorWithPreview', true);
-		this.lineBreaks = !!rstConfig.get<boolean>('preview.breaks', false);
 		this.doubleClickToSwitchToEditor = !!rstConfig.get<boolean>('preview.doubleClickToSwitchToEditor', true);
 		this.markEditorSelection = !!rstConfig.get<boolean>('preview.markEditorSelection', true);
+		this.pythonPath = rstConfig.get<string>("preview.pythonPath", "python");
 
 		this.styles = rstConfig.get<string[]>('styles', []);
 	}
