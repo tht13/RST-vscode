@@ -1,7 +1,7 @@
 {
   "name": "rst-vscode",
-  "displayName": "ReStructured Text Previewer",
-  "description": "An extension to preview RST files while typing them",
+	"displayName": "%displayName%",
+	"description": "%description%",
   "version": "2.1.0",
   "publisher": "tht13",
   "author": "Thomas Haakon Townsend",
@@ -18,7 +18,7 @@
   "bugs": "https://github.com/tht13/RST-vscode/issues",
   "homepage": "https://github.com/tht13/RST-vscode/blob/master/README.md",
   "icon": "media/icon.png",
-  "main": "./out/extension",
+  "main": "./out/extension.js",
   "engines": {
     "vscode": "^1.26.0"
   },
@@ -28,9 +28,15 @@
   ],
   "activationEvents": [
     "workspaceContains:**/*.rst",
-    "onCommand:rst.preview",
-    "onCommand:rst.previewToSide",
-    "onCommand:rst.source"
+		"onLanguage:rst",
+		"onCommand:rst.preview.toggleLock",
+		"onCommand:rst.preview.refresh",
+		"onCommand:rst.showPreview",
+		"onCommand:rst.showPreviewToSide",
+		"onCommand:rst.showLockedPreviewToSide",
+		"onCommand:rst.showSource",
+		"onCommand:rst.showPreviewSecuritySelector",
+		"onWebviewPanel:rst.preview"
   ],
   "contributes": {
     "languages": [
@@ -46,70 +52,198 @@
         ]
       }
     ],
-    "keybindings": [
-      {
-        "command": "rst.preview",
-        "key": "ctrl+shift+r",
-        "mac": "cmd+shift+r",
-        "when": "!terminalFocus"
-      },
-      {
-        "command": "rst.previewToSide",
-        "key": "ctrl+k r",
-        "mac": "cmd+k r"
-      }
-    ],
     "commands": [
-      {
-        "command": "rst.preview",
-        "title": "Open Preview",
-        "category": "ReStructured Text",
-        "icon": {
-          "light": "./media/Preview.svg",
-          "dark": "./media/Preview_inverse.svg"
-        }
-      },
-      {
-        "command": "rst.previewToSide",
-        "title": "Open Preview to the Side",
-        "category": "ReStructured Text",
-        "icon": {
-          "light": "./media/PreviewOnRightPane_16x.svg",
-          "dark": "./media/PreviewOnRightPane_16x_dark.svg"
-        }
-      },
-      {
-        "command": "rst.source",
-        "title": "Show Source",
-        "category": "ReStructured Text",
-        "icon": {
-          "light": "./media/ViewSource.svg",
-          "dark": "./media/ViewSource_inverse.svg"
-        }
-      }
-    ],
-    "menus": {
-      "editor/title": [
-        {
-          "when": "editorLangId == rst",
-          "command": "rst.preview",
-          "alt": "rst.previewToSide",
-          "group": "navigation"
-        },
-        {
-          "when": "resourceScheme == rst",
-          "command": "rst.source",
-          "group": "navigation"
-        }
-      ],
-      "explorer/context": [
-        {
-          "when": "editorLangId == rst",
-          "command": "rst.preview",
-          "group": "navigation"
-        }
-      ]
-    },
+			{
+				"command": "rst.showPreview",
+				"title": "%rst.preview.title%",
+				"category": "RST",
+				"icon": {
+					"light": "./media/Preview.svg",
+					"dark": "./media/Preview_inverse.svg"
+				}
+			},
+			{
+				"command": "rst.showPreviewToSide",
+				"title": "%rst.previewSide.title%",
+				"category": "RST",
+				"icon": {
+					"light": "./media/PreviewOnRightPane_16x.svg",
+					"dark": "./media/PreviewOnRightPane_16x_dark.svg"
+				}
+			},
+			{
+				"command": "rst.showLockedPreviewToSide",
+				"title": "%rst.showLockedPreviewToSide.title%",
+				"category": "RST",
+				"icon": {
+					"light": "./media/PreviewOnRightPane_16x.svg",
+					"dark": "./media/PreviewOnRightPane_16x_dark.svg"
+				}
+			},
+			{
+				"command": "rst.showSource",
+				"title": "%rst.showSource.title%",
+				"category": "RST",
+				"icon": {
+					"light": "./media/ViewSource.svg",
+					"dark": "./media/ViewSource_inverse.svg"
+				}
+			},
+			{
+				"command": "rst.showPreviewSecuritySelector",
+				"title": "%rst.showPreviewSecuritySelector.title%",
+				"category": "RST"
+			},
+			{
+				"command": "rst.preview.refresh",
+				"title": "%rst.preview.refresh.title%",
+				"category": "RST"
+			},
+			{
+				"command": "rst.preview.toggleLock",
+				"title": "%rst.preview.toggleLock.title%",
+				"category": "RST"
+			}
+		],
+		"menus": {
+			"editor/title": [
+				{
+					"command": "rst.showPreviewToSide",
+					"when": "editorLangId == rst",
+					"alt": "rst.showPreview",
+					"group": "navigation"
+				},
+				{
+					"command": "rst.showSource",
+					"when": "rstPreviewFocus",
+					"group": "navigation"
+				},
+				{
+					"command": "rst.preview.refresh",
+					"when": "rstPreviewFocus",
+					"group": "1_rst"
+				},
+				{
+					"command": "rst.preview.toggleLock",
+					"when": "rstPreviewFocus",
+					"group": "1_rst"
+				},
+				{
+					"command": "rst.showPreviewSecuritySelector",
+					"when": "rstPreviewFocus",
+					"group": "1_rst"
+				}
+			],
+			"explorer/context": [
+				{
+					"command": "rst.showPreview",
+					"when": "resourceLangId == rst",
+					"group": "navigation"
+				}
+			],
+			"editor/title/context": [
+				{
+					"command": "rst.showPreview",
+					"when": "resourceLangId == rst",
+					"group": "navigation"
+				}
+			],
+			"commandPalette": [
+				{
+					"command": "rst.showPreview",
+					"when": "editorLangId == rst",
+					"group": "navigation"
+				},
+				{
+					"command": "rst.showPreviewToSide",
+					"when": "editorLangId == rst",
+					"group": "navigation"
+				},
+				{
+					"command": "rst.showLockedPreviewToSide",
+					"when": "editorLangId == rst",
+					"group": "navigation"
+				},
+				{
+					"command": "rst.showSource",
+					"when": "rstPreviewFocus",
+					"group": "navigation"
+				},
+				{
+					"command": "rst.showPreviewSecuritySelector",
+					"when": "editorLangId == rst"
+				},
+				{
+					"command": "rst.showPreviewSecuritySelector",
+					"when": "rstPreviewFocus"
+				},
+				{
+					"command": "rst.preview.toggleLock",
+					"when": "rstPreviewFocus"
+				}
+			]
+		},
+		"keybindings": [
+			{
+				"command": "rst.showPreview",
+				"key": "shift+ctrl+v",
+				"mac": "shift+cmd+v",
+				"when": "editorLangId == rst"
+			},
+			{
+				"command": "rst.showPreviewToSide",
+				"key": "ctrl+k v",
+				"mac": "cmd+k v",
+				"when": "editorLangId == rst"
+			}
+		],
+		"configuration": {
+			"type": "object",
+			"title": "RST",
+			"order": 20,
+			"properties": {
+				"rst.preview.scrollPreviewWithEditor": {
+					"type": "boolean",
+					"default": true,
+					"description": "%rst.preview.scrollPreviewWithEditor.desc%",
+					"scope": "resource"
+				},
+				"rst.preview.markEditorSelection": {
+					"type": "boolean",
+					"default": true,
+					"description": "%rst.preview.markEditorSelection.desc%",
+					"scope": "resource"
+				},
+				"rst.preview.scrollEditorWithPreview": {
+					"type": "boolean",
+					"default": true,
+					"description": "%rst.preview.scrollEditorWithPreview.desc%",
+					"scope": "resource"
+				},
+				"rst.preview.doubleClickToSwitchToEditor": {
+					"type": "boolean",
+					"default": true,
+					"description": "%rst.preview.doubleClickToSwitchToEditor.desc%",
+					"scope": "resource"
+				},
+				"rst.preview.pythonPath": {
+					"type": "string",
+					"default": "python",
+					"description": "%rst.preview.pythonPath.desc%",
+					"scope": "resource"
+				},
+				"rst.trace": {
+					"type": "string",
+					"enum": [
+						"off",
+						"verbose"
+					],
+					"default": "off",
+					"description": "%rst.trace.desc%",
+					"scope": "window"
+				}
+			}
+		},
     "grammars": [
       {
         "language": "rst",
