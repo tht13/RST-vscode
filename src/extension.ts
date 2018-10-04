@@ -11,6 +11,7 @@ import { RSTPreviewManager } from './features/previewManager';
 import { Logger } from './logger';
 import { ExtensionContentSecurityPolicyArbiter, PreviewSecuritySelector } from './security';
 import { Python } from './python';
+import { RSTEngine } from './rstEngine';
 
 let extensionPath = "";
 
@@ -18,20 +19,17 @@ export function getExtensionPath(): string {
 	return extensionPath;
 }
 
-let python: Python;
-
-export function getPythonInstance(): Python {
-	return python;
-}
-
-export function activate(context: vscode.ExtensionContext) {
+export async function activate(context: vscode.ExtensionContext) {
 	extensionPath = context.extensionPath;
-	Python.getInstance().then(p => python = p);
 
 	const cspArbiter = new ExtensionContentSecurityPolicyArbiter(context.globalState, context.workspaceState);
 	const logger = new Logger();
 
-	const contentProvider = new RSTContentProvider(context, cspArbiter, logger);
+	const python: Python = new Python(logger);
+	await python.awaitReady();
+	const engine: RSTEngine = new RSTEngine(python, logger);
+
+	const contentProvider = new RSTContentProvider(context, cspArbiter, engine, logger);
 	const previewManager = new RSTPreviewManager(contentProvider, logger);
 	context.subscriptions.push(previewManager);
 

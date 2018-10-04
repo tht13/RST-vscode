@@ -1,22 +1,25 @@
-import { Event, Uri, EventEmitter, TextDocument } from "vscode";
+import { Uri, TextDocument } from "vscode";
 import * as path from "path";
-import { exec, ExecException } from "child_process";
-import { getPythonInstance } from "./extension";
+import { Python } from "./python";
+import { Logger } from "./logger";
 
 export class RSTEngine {
-  private constructor() {}
+  public constructor(
+    private readonly python: Python,
+    private readonly logger: Logger
+  ) {}
 
-  private static errorSnippet(error: string): string {
+  private errorSnippet(error: string): string {
     return `<html><body>${error}</body></html>`;
   }
 
-  private static buildPage(document: string, headerArgs: string[]): string {
+  private buildPage(document: string, headerArgs: string[]): string {
     return `<html lang="en">\n<head>\n${headerArgs.join(
       "\n"
     )}\n</head>\n<body>\n${document}\n</body>\n</html>`;
   }
 
-  private static createStylesheet(file: string): string {
+  private createStylesheet(file: string): string {
     let href: string = Uri.parse(
       path.join(__dirname, "..", "..", "static", file)
     )
@@ -25,7 +28,7 @@ export class RSTEngine {
     return `<link href="${href}" rel="stylesheet" />`;
   }
 
-  private static fixLinks(document: string, documentPath: string): string {
+  private fixLinks(document: string, documentPath: string): string {
     return document.replace(
       new RegExp("((?:src|href)=['\"])((?!http|\\/).*?)(['\"])", "gmi"),
       (subString: string, p1: string, p2: string, p3: string): string => {
@@ -40,25 +43,26 @@ export class RSTEngine {
     );
   }
 
-  public static compile(fileName: string): Promise<string> {
-    return getPythonInstance().exec(
+  public compile(fileName: string): Promise<string> {
+    this.logger.log(`Compiling file: ${fileName}`);
+    return this.python.exec(
       path.join(__dirname, "..", "python", "preview.py"),
       fileName
     );
   }
 
-  public static async preview(doc: TextDocument): Promise<string> {
+  public async preview(doc: TextDocument): Promise<string> {
     let html: string;
     try {
-      html = await RSTEngine.compile(doc.fileName);
+      html = await this.compile(doc.fileName);
     } catch (e) {
-      return RSTEngine.errorSnippet(e.toString());
+      return this.errorSnippet(e.toString());
     }
-    let result: string = RSTEngine.fixLinks(html, doc.fileName);
+    let result: string = this.fixLinks(html, doc.fileName);
     let headerArgs: string[] = [
-      RSTEngine.createStylesheet("basic.css"),
-      RSTEngine.createStylesheet("default.css")
+      this.createStylesheet("basic.css"),
+      this.createStylesheet("default.css")
     ];
-    return RSTEngine.buildPage(result, headerArgs);
+    return this.buildPage(result, headerArgs);
   }
 }

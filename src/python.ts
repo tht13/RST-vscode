@@ -1,5 +1,6 @@
 import * as vscode from "vscode";
 import { exec, ExecException } from "child_process";
+import { Logger } from "./logger";
 
 export class Python {
   private static instance: Python;
@@ -8,29 +9,40 @@ export class Python {
   private pythonPath = vscode.workspace
     .getConfiguration("rst")
     .get<string>("preview.pythonPath", "python");
+  private ready: boolean = false;
 
-  public static async getInstance(): Promise<Python> {
-    if (!this.instance) {
-      this.instance = new Python();
-    }
-    await this.instance.ready();
-    return this.instance;
+  public constructor(private readonly logger: Logger) {
+    this.setup();
   }
 
-  private constructor() {}
+  public isReady(): boolean {
+    return this.ready;
+  }
 
-  private async ready(): Promise<void> {
+  public async awaitReady(): Promise<void> {
+    return new Promise<void>((res, rej) => {
+      const int = setInterval(() => {
+        if (this.ready) {
+          clearInterval(int);
+          res();
+        }
+      }, 500);
+    });
+  }
+
+  private async setup(): Promise<void> {
     await this.getVersion();
     if (!(await this.checkDocutilsInstall())) {
       await this.installDocutils();
     }
+    this.ready = true;
   }
 
   private async installDocutils(): Promise<void> {
     try {
       await this.exec("-m", "pip", "install", "docutils");
     } catch (e) {
-      console.log("Failed to install pip");
+      this.logger.log("Failed to install docutils");
       vscode.window.showErrorMessage(
         "Could not install docutils. Please run `pip install docutils` to use this " +
           "extension, or check your python path."
@@ -70,7 +82,7 @@ export class Python {
   public exec(...args: string[]): Promise<string> {
     const cmd = [this.pythonPath, ...args];
     return new Promise<string>((resolve, reject) => {
-      console.log(`Running cmd: python ${args.join(" ")}`);
+      this.logger.log(`Running cmd: python ${args.join(" ")}`);
       exec(
         cmd.join(" "),
         (error: ExecException | null, stdout: string, stderr: string) => {
@@ -82,9 +94,10 @@ export class Python {
               "",
               stderr.toString()
             ].join("\n");
-            console.error(errorMessage);
+            this.logger.log(errorMessage);
             reject(errorMessage);
           } else {
+            this.logger.log("Successful exec", stdout.toString());
             resolve(stdout.toString());
           }
         }

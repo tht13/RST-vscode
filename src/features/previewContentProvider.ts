@@ -39,6 +39,7 @@ export class RSTContentProvider {
 	constructor(
 		private readonly context: vscode.ExtensionContext,
 		private readonly cspArbiter: ContentSecurityPolicyArbiter,
+		private readonly engine: RSTEngine,
 		private readonly logger: Logger
 	) { }
 
@@ -67,7 +68,7 @@ export class RSTContentProvider {
 		// Content Security Policy
 		const nonce = new Date().getTime() + '' + new Date().getMilliseconds();
 		const csp = this.getCspForResource(sourceUri, nonce);
-		const renderedDoc = await RSTEngine.preview(htmlDocument);
+		const renderedDoc = await this.engine.preview(htmlDocument);
         const parsedDoc = renderedDoc.split("\n").map((l,i) => 
 			l.replace(this.TAG_RegEx, (
 				match: string, p1: string, p2: string, p3: string, 
