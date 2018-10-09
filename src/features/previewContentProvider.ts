@@ -46,17 +46,17 @@ export class RSTContentProvider {
 	private readonly TAG_RegEx = /^\s*?\<(p|h[1-6]|img|code|div|blockquote|li)((\s+.*?)(class="(.*?)")(.*?\>)|\>|\>|\/\>|\s+.*?\>)/;
 
 	public async provideTextDocumentContent(
-		htmlDocument: vscode.TextDocument,
+		rstDocument: vscode.TextDocument,
 		previewConfigurations: RSTPreviewConfigurationManager,
 		initialLine: number | undefined = undefined,
 		state?: any
 	): Promise<string> {
-		const sourceUri = htmlDocument.uri;
+		const sourceUri = rstDocument.uri;
 		const config = previewConfigurations.loadAndCacheConfiguration(sourceUri);
 		const initialData = {
 			source: sourceUri.toString(),
 			line: initialLine,
-			lineCount: htmlDocument.lineCount,
+			lineCount: rstDocument.lineCount,
 			scrollPreviewWithEditor: config.scrollPreviewWithEditor,
 			scrollEditorWithPreview: config.scrollEditorWithPreview,
 			doubleClickToSwitchToEditor: config.doubleClickToSwitchToEditor,
@@ -68,7 +68,7 @@ export class RSTContentProvider {
 		// Content Security Policy
 		const nonce = new Date().getTime() + '' + new Date().getMilliseconds();
 		const csp = this.getCspForResource(sourceUri, nonce);
-		const renderedDoc = await this.engine.preview(htmlDocument);
+		const renderedDoc = await this.engine.preview(rstDocument);
         const parsedDoc = renderedDoc.split("\n").map((l,i) => 
 			l.replace(this.TAG_RegEx, (
 				match: string, p1: string, p2: string, p3: string, 
@@ -80,14 +80,14 @@ export class RSTContentProvider {
         const $ = cheerio.load(parsedDoc);
 		$("head").prepend(`<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
 				${csp}
-				<meta id="vscode-html-preview-data"
+				<meta id="vscode-rst-preview-data"
 					data-settings="${JSON.stringify(initialData).replace(/"/g, '&quot;')}"
 					data-strings="${JSON.stringify(previewStrings).replace(/"/g, '&quot;')}"
 					data-state="${JSON.stringify(state || {}).replace(/"/g, '&quot;')}">
 				<script src="${this.extensionResourcePath('pre.js')}" nonce="${nonce}"></script>
 				<script src="${this.extensionResourcePath('index.js')}" nonce="${nonce}"></script>
 				${this.getStyles(sourceUri, config)}
-				<base href="${htmlDocument.uri.with({ scheme: 'vscode-resource' }).toString(true)}">`);
+				<base href="${rstDocument.uri.with({ scheme: 'vscode-resource' }).toString(true)}">`);
 		$("body").addClass(`vscode-body ${config.markEditorSelection ? 'showEditorSelection' : ''}`);
 		return $.html();
 	}
@@ -142,17 +142,17 @@ export class RSTContentProvider {
 	private getCspForResource(resource: vscode.Uri, nonce: string): string {
 		switch (this.cspArbiter.getSecurityLevelForResource(resource)) {
 			case RSTPreviewSecurityLevel.AllowInsecureContent:
-				return `<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src vscode-resource: http: https: data:; media-src vscode-resource: http: https: data:; script-src https: vscode-resource:; style-src vscode-resource: 'unsafe-inline' http: https: data:; font-src vscode-resource: http: https: data:;">`;
+				return `<meta http-equiv="Content-Security-Policy" content="default-src vscode-resource:; img-src vscode-resource: http: https: data:; media-src vscode-resource: http: https: data:; script-src https: vscode-resource:; style-src vscode-resource: 'unsafe-inline' http: https: data:; font-src vscode-resource: http: https: data:;">`;
 
 			case RSTPreviewSecurityLevel.AllowInsecureLocalContent:
-				return `<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src vscode-resource: https: data: http://localhost:* http://127.0.0.1:*; media-src vscode-resource: https: data: http://localhost:* http://127.0.0.1:*; script-src https: vscode-resource:; style-src vscode-resource: 'unsafe-inline' https: data: http://localhost:* http://127.0.0.1:*; font-src vscode-resource: https: data: http://localhost:* http://127.0.0.1:*;">`;
+				return `<meta http-equiv="Content-Security-Policy" content="default-src vscode-resource:; img-src vscode-resource: https: data: http://localhost:* http://127.0.0.1:*; media-src vscode-resource: https: data: http://localhost:* http://127.0.0.1:*; script-src https: vscode-resource:; style-src vscode-resource: 'unsafe-inline' https: data: http://localhost:* http://127.0.0.1:*; font-src vscode-resource: https: data: http://localhost:* http://127.0.0.1:*;">`;
 
 			case RSTPreviewSecurityLevel.AllowScriptsAndAllContent:
 				return '';
 
 			case RSTPreviewSecurityLevel.Strict:
 			default:
-				return `<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src vscode-resource: https: data:; media-src vscode-resource: https: data:; script-src https: vscode-resource:; style-src vscode-resource: 'unsafe-inline' https: data:; font-src vscode-resource: https: data:;">`;
+				return `<meta http-equiv="Content-Security-Policy" content="default-src vscode-resource:; img-src vscode-resource: https: data:; media-src vscode-resource: https: data:; script-src https: vscode-resource:; style-src vscode-resource: 'unsafe-inline' https: data:; font-src vscode-resource: https: data:;">`;
 		}
 	}
 }

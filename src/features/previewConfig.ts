@@ -4,6 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import * as vscode from 'vscode';
+import { join } from 'path';
 
 export class RSTPreviewConfiguration {
 	public static getForResource(resource: vscode.Uri) {
@@ -28,7 +29,10 @@ export class RSTPreviewConfiguration {
 		this.markEditorSelection = !!rstConfig.get<boolean>('preview.markEditorSelection', true);
 		this.pythonPath = rstConfig.get<string>("preview.pythonPath", "python");
 
-		this.styles = rstConfig.get<string[]>('styles', []);
+		this.styles = [
+			join(__dirname, "..", "..", "static", "basic.css"),
+			join(__dirname, "..", "..", "static", "default.css")
+		].concat(rstConfig.get<string[]>('styles', []));
 	}
 
 	public isEqualTo(otherConfig: RSTPreviewConfiguration) {
