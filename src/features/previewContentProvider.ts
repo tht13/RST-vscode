@@ -12,7 +12,6 @@ const localize = nls.loadMessageBundle();
 import { Logger } from '../logger';
 import { ContentSecurityPolicyArbiter, RSTPreviewSecurityLevel } from '../security';
 import { RSTPreviewConfigurationManager, RSTPreviewConfiguration } from './previewConfig';
-import * as cheerio from "cheerio";
 import { RSTEngine } from '../rstEngine';
 
 /**
@@ -68,17 +67,20 @@ export class RSTContentProvider {
 		// Content Security Policy
 		const nonce = new Date().getTime() + '' + new Date().getMilliseconds();
 		const csp = this.getCspForResource(sourceUri, nonce);
-		const renderedDoc = await this.engine.preview(rstDocument);
-        const parsedDoc = renderedDoc.split("\n").map((l,i) => 
+
+		const body = await this.engine.preview(rstDocument);
+		const parsedDoc = body.split("\n").map((l,i) => 
 			l.replace(this.TAG_RegEx, (
 				match: string, p1: string, p2: string, p3: string, 
 				p4: string, p5: string, p6: string, offset: number) => 
 			l.replace(match, typeof p5 !== "string" ? 
 			`<${p1} class="code-line" data-line="${i+1}" ${p2}` : 
 			`<${p1} ${p3} class="${p5} code-line" data-line="${i+1}" ${p6}`))
-        ).join("\n");
-        const $ = cheerio.load(parsedDoc);
-		$("head").prepend(`<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+		).join("\n");
+		return `<!DOCTYPE html>
+			<html>
+			<head>
+				<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
 				${csp}
 				<meta id="vscode-rst-preview-data"
 					data-settings="${JSON.stringify(initialData).replace(/"/g, '&quot;')}"
@@ -86,10 +88,14 @@ export class RSTContentProvider {
 					data-state="${JSON.stringify(state || {}).replace(/"/g, '&quot;')}">
 				<script src="${this.extensionResourcePath('pre.js')}" nonce="${nonce}"></script>
 				<script src="${this.extensionResourcePath('index.js')}" nonce="${nonce}"></script>
-				${this.getStyles(sourceUri, config)}
-				<base href="${rstDocument.uri.with({ scheme: 'vscode-resource' }).toString(true)}">`);
-		$("body").addClass(`vscode-body ${config.markEditorSelection ? 'showEditorSelection' : ''}`);
-		return $.html();
+				${this.getStyles(sourceUri, nonce, config)}
+				<base href="${rstDocument.uri.with({ scheme: 'vscode-resource' }).toString(true)}">
+			</head>
+			<body class="vscode-body ${config.scrollBeyondLastLine ? 'scrollBeyondLastLine' : ''} ${config.wordWrap ? 'wordWrap' : ''} ${config.rstEditorSelection ? 'showEditorSelection' : ''}">
+				${parsedDoc}
+				<div class="code-line" data-line="${rstDocument.lineCount}"></div>
+			</body>
+			</html>`;
 	}
 
 	private extensionResourcePath(mediaFile: string): string {
@@ -139,8 +145,8 @@ export class RSTContentProvider {
 		return '';
 	}
 
-	private getSettingsOverrideStyles(config: RSTPreviewConfiguration): string {
-		return `<style>
+	private getSettingsOverrideStyles(nonce: string, config: RSTPreviewConfiguration): string {
+		return `<style nonce="${nonce}">
 			body {
 				${config.fontFamily ? `font-family: ${config.fontFamily};` : ''}
 				${isNaN(config.fontSize) ? '' : `font-size: ${config.fontSize}px;`}
@@ -149,10 +155,10 @@ export class RSTContentProvider {
 		</style>`;
 	}
 
-	private getStyles(resource: vscode.Uri, config: RSTPreviewConfiguration): string {
+	private getStyles(resource: vscode.Uri, nonce: string, config: RSTPreviewConfiguration): string {
 		const fix = (href: string) =>
 		  vscode.Uri.file(href)
-			// .with({ scheme: "vscode-resource" })
+			.with({ scheme: "vscode-resource" })
 			.toString();
 		const baseStyles = config.baseStyles
 		  .map(
@@ -161,24 +167,24 @@ export class RSTContentProvider {
 		  .join("\n");
 
 		return `${baseStyles}
-			${this.getSettingsOverrideStyles(config)}
+			${this.getSettingsOverrideStyles(nonce, config)}
 			${this.computeCustomStyleSheetIncludes(resource, config)}`;
 	}
 
 	private getCspForResource(resource: vscode.Uri, nonce: string): string {
 		switch (this.cspArbiter.getSecurityLevelForResource(resource)) {
 			case RSTPreviewSecurityLevel.AllowInsecureContent:
-				return `<meta http-equiv="Content-Security-Policy" content="default-src vscode-resource:; img-src vscode-resource: http: https: data:; media-src vscode-resource: http: https: data:; script-src https: vscode-resource:; style-src vscode-resource: 'unsafe-inline' http: https: data:; font-src vscode-resource: http: https: data:;">`;
+				return `<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src vscode-resource: http: https: data:; media-src vscode-resource: http: https: data:; script-src 'nonce-${nonce}'; style-src vscode-resource: 'unsafe-inline' http: https: data:; font-src vscode-resource: http: https: data:;">`;
 
 			case RSTPreviewSecurityLevel.AllowInsecureLocalContent:
-				return `<meta http-equiv="Content-Security-Policy" content="default-src vscode-resource:; img-src vscode-resource: https: data: http://localhost:* http://127.0.0.1:*; media-src vscode-resource: https: data: http://localhost:* http://127.0.0.1:*; script-src https: vscode-resource:; style-src vscode-resource: 'unsafe-inline' https: data: http://localhost:* http://127.0.0.1:*; font-src vscode-resource: https: data: http://localhost:* http://127.0.0.1:*;">`;
+				return `<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src vscode-resource: https: data: http://localhost:* http://127.0.0.1:*; media-src vscode-resource: https: data: http://localhost:* http://127.0.0.1:*; script-src 'nonce-${nonce}'; style-src vscode-resource: 'unsafe-inline' https: data: http://localhost:* http://127.0.0.1:*; font-src vscode-resource: https: data: http://localhost:* http://127.0.0.1:*;">`;
 
 			case RSTPreviewSecurityLevel.AllowScriptsAndAllContent:
 				return '';
 
 			case RSTPreviewSecurityLevel.Strict:
 			default:
-				return `<meta http-equiv="Content-Security-Policy" content="default-src vscode-resource:; img-src vscode-resource: https: data:; media-src vscode-resource: https: data:; script-src https: vscode-resource:; style-src vscode-resource: 'unsafe-inline' https: data:; font-src vscode-resource: https: data:;">`;
+				return `<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src vscode-resource: https: data:; media-src vscode-resource: https: data:; script-src 'nonce-${nonce}'; style-src vscode-resource: 'unsafe-inline' https: data:; font-src vscode-resource: https: data:;">`;
 		}
 	}
 }

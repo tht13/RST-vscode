@@ -11,11 +11,16 @@ export class RSTPreviewConfiguration {
 		return new RSTPreviewConfiguration(resource);
 	}
 
+	public readonly scrollBeyondLastLine: boolean;
+	public readonly wordWrap: boolean;
 	public readonly doubleClickToSwitchToEditor: boolean;
 	public readonly scrollEditorWithPreview: boolean;
 	public readonly scrollPreviewWithEditor: boolean;
-	public readonly markEditorSelection: boolean;
+	public readonly rstEditorSelection: boolean;
 
+	public readonly lineHeight: number;
+	public readonly fontSize: number;
+	public readonly fontFamily: string | undefined;
 	public readonly styles: string[];
 	public readonly baseStyles: string[];
 
@@ -24,18 +29,31 @@ export class RSTPreviewConfiguration {
 		const rstConfig = vscode.workspace.getConfiguration('rst', resource);
 		const rstEditorConfig = vscode.workspace.getConfiguration('[rst]', resource);
 
+
+		this.scrollBeyondLastLine = editorConfig.get<boolean>('scrollBeyondLastLine', false);
+
+		this.wordWrap = editorConfig.get<string>('wordWrap', 'off') !== 'off';
+		if (rstEditorConfig && rstEditorConfig['editor.wordWrap']) {
+			this.wordWrap = rstEditorConfig['editor.wordWrap'] !== 'off';
+		}
+
 		this.scrollPreviewWithEditor = !!rstConfig.get<boolean>('preview.scrollPreviewWithEditor', true);
 		this.scrollEditorWithPreview = !!rstConfig.get<boolean>('preview.scrollEditorWithPreview', true);
+		this.lineBreaks = !!rstConfig.get<boolean>('preview.breaks', false);
 		this.doubleClickToSwitchToEditor = !!rstConfig.get<boolean>('preview.doubleClickToSwitchToEditor', true);
-		this.markEditorSelection = !!rstConfig.get<boolean>('preview.markEditorSelection', true);
+		this.rstEditorSelection = !!rstConfig.get<boolean>('preview.markEditorSelection', true);
 		this.pythonPath = rstConfig.get<string>("preview.pythonPath", "python");
+
+		this.fontFamily = rstConfig.get<string | undefined>('preview.fontFamily', undefined);
+		this.fontSize = Math.max(8, +rstConfig.get<number>('preview.fontSize', NaN));
+		this.lineHeight = Math.max(0.6, +rstConfig.get<number>('preview.lineHeight', NaN));
 
 		this.baseStyles = [
 			join(__dirname, "..", "..", "static", "basic.css"),
 			join(__dirname, "..", "..", "static", "default.css")
 		];
 
-		this.styles = rstConfig.get<string[]>('styles', []);
+		this.styles = this.baseStyles.concat(rstConfig.get<string[]>('styles', []));
 	}
 
 	public isEqualTo(otherConfig: RSTPreviewConfiguration) {
