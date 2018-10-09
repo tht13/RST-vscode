@@ -49,8 +49,8 @@ export class RSTPreviewConfiguration {
 		this.lineHeight = Math.max(0.6, +rstConfig.get<number>('preview.lineHeight', NaN));
 
 		this.baseStyles = [
-			join(__dirname, "..", "..", "static", "basic.css"),
-			join(__dirname, "..", "..", "static", "default.css")
+			join(__dirname, "..", "..", "media", "basic.css"),
+			join(__dirname, "..", "..", "media", "default.css")
 		];
 
 		this.styles = this.baseStyles.concat(rstConfig.get<string[]>('styles', []));

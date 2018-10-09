@@ -15,16 +15,10 @@ export class RSTEngine {
 
   public async compile(fileName: string): Promise<string> {
     this.logger.log(`Compiling file: ${fileName}`);
-    return `<html lang="en">
-  <head>
-  </head>
-  <body>
-  ${await this.python.exec(
-    path.join(__dirname, "..", "python", "preview.py"),
-    fileName
-  )}
-  </body>
-  </html>`;
+    return this.python.exec(
+      path.join(__dirname, "..", "python", "preview.py"),
+      fileName
+    );
   }
 
   public async preview(doc: TextDocument): Promise<string> {
