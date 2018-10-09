@@ -130,13 +130,39 @@ export class RSTContentProvider {
 			.toString();
 	}
 
-	private getStyles(resource: vscode.Uri, config: RSTPreviewConfiguration): string {
+	private computeCustomStyleSheetIncludes(resource: vscode.Uri, config: RSTPreviewConfiguration): string {
 		if (Array.isArray(config.styles)) {
 			return config.styles.map(style => {
 				return `<link rel="stylesheet" class="code-user-style" data-source="${style.replace(/"/g, '&quot;')}" href="${this.fixHref(resource, style)}" type="text/css" media="screen">`;
 			}).join('\n');
 		}
 		return '';
+	}
+
+	private getSettingsOverrideStyles(config: RSTPreviewConfiguration): string {
+		return `<style>
+			body {
+				${config.fontFamily ? `font-family: ${config.fontFamily};` : ''}
+				${isNaN(config.fontSize) ? '' : `font-size: ${config.fontSize}px;`}
+				${isNaN(config.lineHeight) ? '' : `line-height: ${config.lineHeight};`}
+			}
+		</style>`;
+	}
+
+	private getStyles(resource: vscode.Uri, config: RSTPreviewConfiguration): string {
+		const fix = (href: string) =>
+		  vscode.Uri.file(href)
+			// .with({ scheme: "vscode-resource" })
+			.toString();
+		const baseStyles = config.baseStyles
+		  .map(
+			href => `<link rel="stylesheet" type="text/css" href="${fix(href)}">`
+		  )
+		  .join("\n");
+
+		return `${baseStyles}
+			${this.getSettingsOverrideStyles(config)}
+			${this.computeCustomStyleSheetIncludes(resource, config)}`;
 	}
 
 	private getCspForResource(resource: vscode.Uri, nonce: string): string {

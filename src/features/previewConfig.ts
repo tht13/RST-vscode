@@ -17,8 +17,9 @@ export class RSTPreviewConfiguration {
 	public readonly markEditorSelection: boolean;
 
 	public readonly styles: string[];
+	public readonly baseStyles: string[];
 
-	private constructor(resource: vscode.Uri) {
+	private constructor(resource: vscode.Uri | null = null) {
 		const editorConfig = vscode.workspace.getConfiguration('editor', resource);
 		const rstConfig = vscode.workspace.getConfiguration('rst', resource);
 		const rstEditorConfig = vscode.workspace.getConfiguration('[rst]', resource);
@@ -29,10 +30,12 @@ export class RSTPreviewConfiguration {
 		this.markEditorSelection = !!rstConfig.get<boolean>('preview.markEditorSelection', true);
 		this.pythonPath = rstConfig.get<string>("preview.pythonPath", "python");
 
-		this.styles = [
+		this.baseStyles = [
 			join(__dirname, "..", "..", "static", "basic.css"),
 			join(__dirname, "..", "..", "static", "default.css")
-		].concat(rstConfig.get<string[]>('styles', []));
+		];
+
+		this.styles = rstConfig.get<string[]>('styles', []);
 	}
 
 	public isEqualTo(otherConfig: RSTPreviewConfiguration) {
