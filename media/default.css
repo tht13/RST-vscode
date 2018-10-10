@@ -11,12 +11,6 @@
 
 /* -- page layout ----------------------------------------------------------- */
 
-* {
-    font-size: initial;
-    background-color: #ddd;
-    color: #333;
-}
-
 body {
     margin: 20px;
     padding: 0;
@@ -32,13 +26,10 @@ div.bodywrapper {
 }
 
 div.body {
-    background-color: #ddd;
-    color: #333;
     padding: 0 20px 30px 20px;
 }
 
 div.footer {
-    color: #333;
     width: 100%;
     padding: 9px 0 9px 0;
     text-align: center;
@@ -46,28 +37,20 @@ div.footer {
 }
 
 div.footer a {
-    color: #333;
     text-decoration: underline;
 }
 
 div.related {
-    background-color: #bbb;
     line-height: 30px;
-    color: #333;
 }
 
-div.related a {
-    color: #666;
-}
 /* -- hyperlink styles ------------------------------------------------------ */
 
 a {
-    color: #33d;
     text-decoration: none;
 }
 
 a:visited {
-    color: #33d;
     text-decoration: none;
 }
 
@@ -99,9 +82,7 @@ div.body h4,
 div.body h5,
 div.body h6 {
     font-family: Arial, Helvetica, sans-serif;
-    background-color: #ddd;
     font-weight: normal;
-    color: #555;
     border-bottom: 1px solid #ccc;
     margin: 20px -20px 10px -20px;
     padding: 3px 0 3px 10px;
@@ -115,15 +96,9 @@ div.body h5 { font-size: 110%; }
 div.body h6 { font-size: 100%; }
 
 a.headerlink {
-    color: #55d;
     font-size: 0.8em;
     padding: 0 4px 0 4px;
     text-decoration: none;
-}
-
-a.headerlink:hover {
-    background-color: #55d;
-    color: white;
 }
 
 div.body p, div.body dd, div.body li, div.body blockquote {
@@ -148,21 +123,14 @@ div.admonition ul, div.admonition ol {
 }
 
 div.note {
-    background-color: #eee;
     border: 1px solid #ccc;
 }
 
 div.seealso {
-    background-color: #ffc;
     border: 1px solid #ff6;
 }
 
-div.topic {
-    background-color: #eee;
-}
-
 div.warning {
-    background-color: #ffe4e4;
     border: 1px solid #f66;
 }
 
@@ -176,8 +144,6 @@ p.admonition-title:after {
 
 pre {
     padding: 5px;
-    background-color: #050;
-    color: #bb0;
     line-height: 120%;
     border: 1px solid #ac9;
     border-left: none;
@@ -185,21 +151,8 @@ pre {
 }
 
 code {
-    background-color: #ecf0f3;
     padding: 0 1px 0 1px;
     font-size: 0.95em;
-}
-
-th {
-    background-color: #ede;
-}
-
-.warning code {
-    background: #efc2c2;
-}
-
-.note code {
-    background: #d6d6d6;
 }
 
 .viewcode-back {
@@ -207,12 +160,6 @@ th {
 }
 
 div.viewcode-block:target {
-    background-color: #f4debf;
     border-top: 1px solid #ac9;
     border-bottom: 1px solid #ac9;
-}
-
-div.code-block-caption {
-    color: #efefef;
-    background-color: #1c4e63;
 }

@@ -83,7 +83,6 @@ table.indextable tr.pcap {
 
 table.indextable tr.cap {
     margin-top: 10px;
-    background-color: #f2f2f2;
 }
 
 img.toggler {
@@ -182,7 +181,6 @@ div.sidebar {
     margin: 0 0 0.5em 1em;
     border: 1px solid #ddb;
     padding: 7px 7px 0 7px;
-    background-color: #ffe;
     width: 40%;
     float: right;
 }
@@ -242,9 +240,6 @@ table caption span.caption-number {
     font-style: italic;
 }
 
-table caption span.caption-text {
-}
-
 table.docutils td, table.docutils th {
     padding: 1px 8px 1px 5px;
     border-top: 0;
@@ -290,10 +285,6 @@ div.figure p.caption span.caption-number {
     font-style: italic;
 }
 
-div.figure p.caption span.caption-text {
-}
-
-
 /* -- other body styles ----------------------------------------------------- */
 
 ol.arabic {
@@ -334,10 +325,6 @@ dd {
     margin-left: 30px;
 }
 
-dt:target, .highlighted {
-    background-color: #fbe54e;
-}
-
 dl.glossary dt {
     font-weight: bold;
     font-size: 1.1em;
@@ -365,13 +352,8 @@ dl.glossary dt {
 }
 
 .system-message {
-    background-color: #fda;
     padding: 5px;
     border: 3px solid red;
-}
-
-.footnote:target  {
-    background-color: #ffa;
 }
 
 .line-block {
@@ -414,7 +396,6 @@ td.linenos pre {
     padding: 5px 0px;
     border: 0;
     background-color: transparent;
-    color: #aaa;
 }
 
 table.highlighttable {
@@ -441,9 +422,6 @@ div.code-block-caption + div > div.highlight > pre {
 div.code-block-caption span.caption-number {
     padding: 0.1em 0.3em;
     font-style: italic;
-}
-
-div.code-block-caption span.caption-text {
 }
 
 div.literal-block-wrapper {

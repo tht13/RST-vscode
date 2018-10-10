@@ -42,7 +42,7 @@ export class RSTContentProvider {
 		private readonly logger: Logger
 	) { }
 
-	private readonly TAG_RegEx = /^\s*?\<(p|h[1-6]|img|code|div|blockquote|li)((\s+.*?)(class="(.*?)")(.*?\>)|\>|\>|\/\>|\s+.*?\>)/;
+	private readonly TAG_RegEx = /^\s*?\<(p|h[1-6]|img|code|blockquote|li)((\s+.*?)(class="(.*?)")(.*?\>)|\>|\>|\/\>|\s+.*?\>)/;
 
 	public async provideTextDocumentContent(
 		rstDocument: vscode.TextDocument,
