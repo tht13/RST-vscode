@@ -1,5 +1,36 @@
 # Changes
 
+## 3.0.0
+
+- Fix tests
+- Remove cheerio types
+- Update CSS
+- Fix get null resource issue
+- Move css files to media folder
+- Use MD page generation and nonce csp
+- Update style settings
+- Simplify page building
+- Fix tests
+- Fix tests
+- Update package config
+- Refactor init of rstEngine and python classes
+- Implement python interface
+- Add python interface
+- Remove docutils from bundle
+- Fix config issues
+- Fix dep vulnerabilities
+- Fix test
+- Rename html to RST
+- Integrate rst engine
+- import new html-preview based code
+- fix conflicts
+- Update extensions and move python
+- Update extensions and move python
+- Use ES6 for of loops (Thomas Townsend)
+- Update tests to run full and partial previews (Thomas Townsend)
+- Make relevant methods static for better testing (Thomas Townsend)
+- Update test case samples (Thomas Townsend)
+
 ## 2.1.0
 
 - Fix expected test result (Thomas Townsend)
