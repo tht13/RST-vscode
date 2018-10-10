@@ -3,11 +3,9 @@ import { exec, ExecException } from "child_process";
 import { Logger } from "./logger";
 
 export class Python {
-  private static instance: Python;
-
   private version: 2 | 3 | null = null;
   private pythonPath = vscode.workspace
-    .getConfiguration("rst")
+    .getConfiguration("rst", null)
     .get<string>("preview.pythonPath", "python");
   private ready: boolean = false;
 

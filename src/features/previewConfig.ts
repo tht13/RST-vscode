@@ -24,7 +24,7 @@ export class RSTPreviewConfiguration {
 	public readonly styles: string[];
 	public readonly baseStyles: string[];
 
-	private constructor(resource: vscode.Uri | null = null) {
+	private constructor(resource: vscode.Uri) {
 		const editorConfig = vscode.workspace.getConfiguration('editor', resource);
 		const rstConfig = vscode.workspace.getConfiguration('rst', resource);
 		const rstEditorConfig = vscode.workspace.getConfiguration('[rst]', resource);
@@ -50,10 +50,11 @@ export class RSTPreviewConfiguration {
 
 		this.baseStyles = [
 			join(__dirname, "..", "..", "media", "basic.css"),
-			join(__dirname, "..", "..", "media", "default.css")
+			join(__dirname, "..", "..", "media", "default.css"),
+			join(__dirname, "..", "..", "media", "rst.css")
 		];
 
-		this.styles = this.baseStyles.concat(rstConfig.get<string[]>('styles', []));
+		this.styles = rstConfig.get<string[]>('styles', []);
 	}
 
 	public isEqualTo(otherConfig: RSTPreviewConfiguration) {
