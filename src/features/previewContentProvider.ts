@@ -69,13 +69,13 @@ export class RSTContentProvider {
 		const csp = this.getCspForResource(sourceUri, nonce);
 
 		const body = await this.engine.preview(rstDocument);
-		const parsedDoc = body.split("\n").map((l,i) => 
+		const parsedDoc = body.split(/\r?\n/).map((l,i) => 
 			l.replace(this.TAG_RegEx, (
 				match: string, p1: string, p2: string, p3: string, 
 				p4: string, p5: string, p6: string, offset: number) => 
-			l.replace(match, typeof p5 !== "string" ? 
+			typeof p5 !== "string" ? 
 			`<${p1} class="code-line" data-line="${i+1}" ${p2}` : 
-			`<${p1} ${p3} class="${p5} code-line" data-line="${i+1}" ${p6}`))
+			`<${p1} ${p3} class="${p5} code-line" data-line="${i+1}" ${p6}`)
 		).join("\n");
 		return `<!DOCTYPE html>
 			<html>
