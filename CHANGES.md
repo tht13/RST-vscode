@@ -1,5 +1,10 @@
 # Changes
 
+## 3.0.1
+
+- Update tests
+- Fix issue #10
+
 ## 3.0.0
 
 - Fix tests
