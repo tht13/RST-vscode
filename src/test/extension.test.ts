@@ -17,10 +17,11 @@ import {
   initialize,
   closeActiveWindows,
   openFile,
-  samplePath
+  samplePath,
+  wait
 } from "./initialize";
 import { Python } from "../python";
-import { Logger, Trace } from "../logger";
+import { Logger } from "../logger";
 
 // Defines a Mocha test suite to group tests of similar kind together
 let engine: RSTEngine;
@@ -61,6 +62,12 @@ suite("Extension Tests", function() {
     this.timeout(30000);
     const editor = await openFile(path.join(samplePath, "example1.rst"));
     const val = await engine.preview(editor.document);
+    // await vscode.commands.executeCommand("rst.showPreviewToSide");
+    // await wait(2000);
+    // if (!vscode.window.activeTextEditor) {
+    //   throw new Error("Failed to preview");
+    // }
+    // const val = (vscode.window.activeTextEditor as vscode.TextEditor).document.getText();
     return new Promise((res, rej) => {
       fs.readFile(
         path.join(samplePath, "example1Full.html"),

@@ -8,6 +8,14 @@ Paragraphs
 
 This is a paragraph
 
+second paragraph
+
+.. code-block:: python
+
+    def hello_world():
+        print("hello world")
+
+
 Images
 ------
 
@@ -25,7 +33,7 @@ Tables
 A grid table
 ~~~~~~~~~~~~
 +------+-------+
-|a     |grid   |
+| a    | grid  |
 +------+-------+
 |   table      |
 +--------------+

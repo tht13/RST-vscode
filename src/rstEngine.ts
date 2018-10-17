@@ -1,4 +1,4 @@
-import { Uri, TextDocument } from "vscode";
+import { TextDocument } from "vscode";
 import * as path from "path";
 import { Python } from "./python";
 import { Logger } from "./logger";

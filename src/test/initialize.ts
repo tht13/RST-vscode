@@ -58,3 +58,7 @@ export async function closeActiveWindows(): Promise<any> {
   assert.equal(vscode.window.visibleTextEditors.length, 0);
   assert(!vscode.window.activeTextEditor);
 }
+
+export function wait(time: number): Promise<void> {
+  return new Promise(res => setTimeout(res, time));
+}
