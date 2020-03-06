@@ -18,10 +18,12 @@ export class RSTEngine {
     this.logger.log(`Compiling file: ${fileName}`);
     const rstConfig = vscode.workspace.getConfiguration('rst', uri);
     const writer = rstConfig.get<string>('preview.docutilsWriter', 'html');
+    const writerPart = rstConfig.get<string>('preview.docutilsWriterPart', 'html_body');
     return this.python.exec(
       path.join(__dirname, "..", "python", "preview.py"),
       fileName,
-      writer
+      writer,
+      writerPart
     );
   }
 

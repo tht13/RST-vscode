@@ -232,6 +232,12 @@
 					"description": "%rst.preview.docutilsWriter.desc%",
 					"scope": "resource"
 				},
+				"rst.preview.docutilsWriterPart": {
+					"type": "string",
+					"default": "html_body",
+					"description": "%rst.preview.docutilsWriterPart.desc%",
+					"scope": "resource"
+				},
 				"rst.preview.pythonPath": {
 					"type": "string",
 					"default": "python",
