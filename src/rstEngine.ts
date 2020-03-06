@@ -1,4 +1,5 @@
-import { TextDocument } from "vscode";
+import * as vscode from 'vscode';
+import { TextDocument, Uri } from "vscode";
 import * as path from "path";
 import { Python } from "./python";
 import { Logger } from "./logger";
@@ -13,17 +14,20 @@ export class RSTEngine {
     return `<html><body>${error}</body></html>`;
   }
 
-  public async compile(fileName: string): Promise<string> {
+  public async compile(fileName: string, uri: Uri): Promise<string> {
     this.logger.log(`Compiling file: ${fileName}`);
+    const rstConfig = vscode.workspace.getConfiguration('rst', uri);
+    const writer = rstConfig.get<string>('preview.docutilsWriter', 'html');
     return this.python.exec(
       path.join(__dirname, "..", "python", "preview.py"),
-      fileName
+      fileName,
+      writer
     );
   }
 
   public async preview(doc: TextDocument): Promise<string> {
     try {
-      return this.compile(doc.fileName);
+      return this.compile(doc.fileName, doc.uri);
     } catch (e) {
       return this.errorSnippet(e.toString());
     }

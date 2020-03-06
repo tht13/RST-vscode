@@ -226,6 +226,12 @@
 					"description": "%rst.preview.doubleClickToSwitchToEditor.desc%",
 					"scope": "resource"
 				},
+				"rst.preview.docutilsWriter": {
+					"type": "string",
+					"default": "html",
+					"description": "%rst.preview.docutilsWriter.desc%",
+					"scope": "resource"
+				},
 				"rst.preview.pythonPath": {
 					"type": "string",
 					"default": "python",
