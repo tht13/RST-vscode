@@ -226,6 +226,18 @@
 					"description": "%rst.preview.doubleClickToSwitchToEditor.desc%",
 					"scope": "resource"
 				},
+				"rst.preview.docutilsWriter": {
+					"type": "string",
+					"default": "html",
+					"description": "%rst.preview.docutilsWriter.desc%",
+					"scope": "resource"
+				},
+				"rst.preview.docutilsWriterPart": {
+					"type": "string",
+					"default": "html_body",
+					"description": "%rst.preview.docutilsWriterPart.desc%",
+					"scope": "resource"
+				},
 				"rst.preview.pythonPath": {
 					"type": "string",
 					"default": "python",
@@ -266,7 +278,7 @@
 	},
 	"dependencies": {
 		"lodash.throttle": "4.1.1",
-		"vscode-nls": "4.0.0"
+		"vscode-nls": "4.1.1"
 	},
 	"devDependencies": {
 		"@studio/changes": "1.7.0",
@@ -275,11 +287,12 @@
 		"@types/node": "10.11.3",
 		"mocha": "5.2.0",
 		"ts-loader": "5.2.1",
+		"ts-node": "^3.3.0",
 		"tslib": "1.9.3",
-		"tslint": "5.11.0",
+		"tslint": "6.0.0",
 		"typescript": "3.1.1",
-		"vscode": "1.1.21",
-		"webpack": "4.20.0",
+		"vscode": "1.1.33",
+		"webpack": "4.41.2",
 		"webpack-cli": "3.1.2"
 	}
 }

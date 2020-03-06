@@ -13,5 +13,7 @@
 	"rst.trace.desc": "Enable debug logging for the rst extension.",
 	"rst.preview.refresh.title": "Refresh Preview",
 	"rst.preview.toggleLock.title": "Toggle Preview Locking",
+	"rst.preview.docutilsWriter.desc": "The docutils writer that will generate the output",
+	"rst.preview.docutilsWriterPart.desc": "The output part of the docutils writer",
 	"rst.preview.pythonPath.desc": "Path to Python executable"
 }
